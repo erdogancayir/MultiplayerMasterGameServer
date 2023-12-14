@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "Server/1.0.0": {
+      "exercises/1.0.0": {
         "dependencies": {
           "MessagePack": "2.5.140"
         },
         "runtime": {
-          "Server.dll": {}
+          "exercises.dll": {}
         }
       },
       "MessagePack/2.5.140": {
@@ -47,7 +47,7 @@
     }
   },
   "libraries": {
-    "Server/1.0.0": {
+    "exercises/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

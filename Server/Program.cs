@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using MessagePack;
 
 namespace TCPServer
 {
@@ -31,12 +32,13 @@ namespace TCPServer
                     Int32 i;
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
-                        data = Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine("Alınan Veri: {0}", data);
-                        data = data.ToUpper();
-                        Byte[] msg = Encoding.ASCII.GetBytes(data);
-                        stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine("Gönderilen Veri: {0}", data);
+                        var message = MessagePackSerializer.Deserialize<MyMessage>(bytes[..i]);
+                        Console.WriteLine("Alınan Veri: {0}", message.Content);
+                        // İşlenen veriyi geri gönder
+                        message.Content = message.Content.ToUpper();
+                        var response = MessagePackSerializer.Serialize(message);
+                        stream.Write(response, 0, response.Length);
+                        Console.WriteLine("Gönderilen Veri: {0}", message.Content);
                     }
                     client.Close();
                     }
