@@ -55,17 +55,19 @@
 
 This architecture aims to provide a robust, scalable, and efficient Master Server for your multiplayer game, ensuring smooth player experiences during login, matchmaking, and transitioning to game servers.
 
-
+nnNkralzoYbFTpxH
 
 src
 ├── main
 │   ├── config
 │   │   ├── DatabaseConfig.cs
 │   │   └── ServerConfig.cs
+|   |   └── LoadServerConfiguration.cs
 │   ├── tests
 │   │   ├── AuthTests.cs
 │   │   ├── MatchmakingTests.cs
 │   │   └── SocketTests.cs
+|   ├── Main.cs
 │   ├── net
 │   │   ├── Authentication
 │   │   │   ├── AuthService.cs
@@ -87,10 +89,12 @@ src
 │   │   ├── SocketListener
 │   │   │   ├── ConnectionHandler.cs
 │   │   │   └── SocketListener.cs
-│   │   └── Utilities
-│   │       ├── Logger.cs
-│   │       └── Packet.cs
-
+│   │   ├── Utilities
+│   │   │   ├── Logger.cs
+│   │   │   └── Packet.cs
+|   |   └── Documents
+|   |       ├── ConfigDirectoryDocument.md
+|   |       └── DatabaseDirectoryDocument.md
 
 Server Components and Their Corresponding Classes
 

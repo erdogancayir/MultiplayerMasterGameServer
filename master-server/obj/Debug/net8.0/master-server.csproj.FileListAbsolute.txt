@@ -1,0 +1,6 @@
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.csproj.AssemblyReference.cache
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.GeneratedMSBuildEditorConfig.editorconfig
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.AssemblyInfoInputs.cache
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.AssemblyInfo.cs
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.csproj.CoreCompileInputs.cache
+/home/erdogancayir/Desktop/gameserver/master-server/obj/Debug/net8.0/master-server.sourcelink.json

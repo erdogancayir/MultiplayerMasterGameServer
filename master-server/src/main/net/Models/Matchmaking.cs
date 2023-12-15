@@ -12,4 +12,4 @@ public class Matchmaking
     public List<string> Players { get; set; } // List of PlayerIDs
     public string LobbyID { get; set; }
     public DateTime StartTime { get; set; }
-    public string Status { get; set;
+    public string Status { get; set; }

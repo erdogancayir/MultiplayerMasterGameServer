@@ -23,7 +23,7 @@ public class SocketListener
         while (true)
         {
             TcpClient client = listener.AcceptTcpClient();
-            // Handle the new connection (e.g., authenticate, establish session)
+            // To handle the new connection (e.g., authenticate, establish session)
             HandleNewConnection(client);
         }
     }

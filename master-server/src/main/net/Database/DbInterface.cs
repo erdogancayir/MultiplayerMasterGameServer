@@ -1,7 +1,4 @@
 using MongoDB.Driver;
-using System.Configuration;
-
-using MongoDB.Driver;
 
 public class DbInterface
 {

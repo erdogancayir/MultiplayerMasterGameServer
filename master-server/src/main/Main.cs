@@ -4,12 +4,15 @@ namespace MasterServer
     {
         public static void Main(string[] args)
         {
-            // Configuration setup (Database, Server Config, etc.)
-            var serverConfig = LoadServerConfiguration();
-            var dbInterface = new DbInterface(serverConfig.MongoDbConnectionString, serverConfig.DatabaseName);
-
+            Console.WriteLine("Starting Master Server...");
+            // These configurations to set up database connections, server settings, etc.
+            var configLoader = new LoadServerConfiguration();
+            var dbConfig = configLoader.DbConfig;
+            var serverConfig = configLoader.ServerConfig;
+            
             // Initialize Socket Listener
             var socketListener = new SocketListener(serverConfig.SocketListenerPort);
+            Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");
             socketListener.Start();
 
             // Additional initializations (Authentication, GameServerManager, etc.)
