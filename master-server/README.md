@@ -1,97 +1,3 @@
-src
-├── main
-│   ├── config
-│   │   ├── DatabaseConfig.cs
-│   │   └── ServerConfig.cs
-│   ├── tests
-│   │   ├── AuthTests.cs
-│   │   ├── MatchmakingTests.cs
-│   │   └── SocketTests.cs
-│   ├── net
-│   │   ├── Authentication
-│   │   │   ├── AuthService.cs
-│   │   │   └── TokenManager.cs
-│   │   ├── Database
-│   │   │   ├── DbInterface.cs
-│   │   │   ├── GameServerManager.cs
-│   │   │   ├── LobbyManager.cs
-│   │   │   └── PlayerManager.cs
-│   │   ├── GameServerManagement
-│   │   │   ├── GameServerManager.cs
-│   │   │   └── HeartbeatMonitor.cs
-│   │   ├── Matchmaking
-│   │   │   ├── LobbyManager.cs
-│   │   │   └── Matchmaker.cs
-│   │   ├── Models
-│   │   │   ├── Lobby.cs
-│   │   │   └── Player.cs
-│   │   ├── SocketListener
-│   │   │   ├── ConnectionHandler.cs
-│   │   │   └── SocketListener.cs
-│   │   └── Utilities
-│   │       ├── Logger.cs
-│   │       └── Packet.cs
-
-
-Database Collections
-    Players
-        Stores information about each player.
-        Fields: PlayerID, Username, PasswordHash, Email, RegistrationDate, LastLogin, PlayerStats, etc.
-    Sessions
-        Stores active and historical player sessions.
-        Fields: SessionID, PlayerID, StartTime, EndTime, IsActive, SessionToken, etc.
-    Lobbies
-        Information about game lobbies.
-        Fields: LobbyID, Players[], MaxPlayers, Status (Waiting, Full, InGame), GameType, CreationTime, etc.
-    GameServers
-        Details of each game server.
-        Fields: ServerID, IPAddress, Port, CurrentLoad, MaxCapacity, Status (Active, Maintenance, Offline), LastHeartbeat, etc.
-    MatchHistory
-        Records of completed game matches.
-        Fields: MatchID, Players[], Scores[], Winner, GameType, StartTime, EndTime, ServerID, etc.
-    PlayerStats
-        Individual player statistics.
-        Fields: PlayerID, TotalGamesPlayed, Wins, Losses, Rankings, Achievements[], etc.
-    AuthTokens
-        For storing authentication tokens.
-        Fields: TokenID, PlayerID, Token, CreationDate, ExpiryDate, etc.
-    Logs
-        Server and game logs for monitoring and debugging.
-        Fields: LogID, Timestamp, LogLevel, Message, PlayerID, ServerID, etc.
-
-Players
-{
-  "PlayerID": "player123",
-  "Username": "GamerTag",
-  "PasswordHash": "hashedpassword",
-  "Email": "gamertag@example.com",
-  "RegistrationDate": "2021-01-01T00:00:00Z",
-  "LastLogin": "2023-01-02T12:00:00Z",
-  "PlayerStats": "stats123"
-}
--------------------------
-Lobbies
-{
-  "LobbyID": "lobby456",
-  "Players": ["player123", "player456"],
-  "MaxPlayers": 4,
-  "Status": "Waiting",
-  "GameType": "Battle Royale",
-  "CreationTime": "2023-01-02T11:00:00Z"
-}
--------------------------
-GameServers
-{
-  "ServerID": "server789",
-  "IPAddress": "192.168.1.10",
-  "Port": 8080,
-  "CurrentLoad": 75,
-  "MaxCapacity": 100,
-  "Status": "Active",
-  "LastHeartbeat": "2023-01-02T11:30:00Z"
-}
-
-
 
 1. Master Server Architecture Overview
 
@@ -148,6 +54,74 @@ GameServers
     In case of a game server failure, seamlessly transfer players to an available server without losing game progress.
 
 This architecture aims to provide a robust, scalable, and efficient Master Server for your multiplayer game, ensuring smooth player experiences during login, matchmaking, and transitioning to game servers.
+
+
+
+src
+├── main
+│   ├── config
+│   │   ├── DatabaseConfig.cs
+│   │   └── ServerConfig.cs
+│   ├── tests
+│   │   ├── AuthTests.cs
+│   │   ├── MatchmakingTests.cs
+│   │   └── SocketTests.cs
+│   ├── net
+│   │   ├── Authentication
+│   │   │   ├── AuthService.cs
+│   │   │   └── TokenManager.cs
+│   │   ├── Database
+│   │   │   ├── DbInterface.cs
+│   │   │   ├── GameServerManager.cs
+│   │   │   ├── LobbyManager.cs
+│   │   │   └── PlayerManager.cs
+│   │   ├── GameServerManagement
+│   │   │   ├── GameServerManager.cs
+│   │   │   └── HeartbeatMonitor.cs
+│   │   ├── Matchmaking
+│   │   │   ├── LobbyManager.cs
+│   │   │   └── Matchmaker.cs
+│   │   ├── Models
+│   │   │   ├── Lobby.cs
+│   │   │   └── Player.cs
+│   │   ├── SocketListener
+│   │   │   ├── ConnectionHandler.cs
+│   │   │   └── SocketListener.cs
+│   │   └── Utilities
+│   │       ├── Logger.cs
+│   │       └── Packet.cs
+
+
+Server Components and Their Corresponding Classes
+
+    Socket Listener (SocketListener Directory)
+        SocketListener.cs: Manages incoming socket connections (TCP/UDP) from players. It initializes player sessions and hands off authentication to the AuthService.
+        ConnectionHandler.cs: Handles individual socket connections, managing the data flow between the server and connected clients.
+
+    Authentication Service (Authentication Directory)
+        AuthService.cs: Manages player authentication, verifies credentials or tokens.
+        TokenManager.cs: Handles token generation and validation for maintaining player sessions.
+
+    Matchmaking Service (Matchmaking Directory)
+        Matchmaker.cs: Responsible for creating and managing game lobbies, matchmaking logic.
+        LobbyManager.cs: Manages the state and participants of game lobbies.
+
+    Database Interface (Database Directory)
+        DbInterface.cs: Central point for interacting with the MongoDB/DynamoDB database.
+        PlayerManager.cs: Manages player-related data in the database.
+        LobbyManager.cs: (Duplicate) Manages lobby data in the database. This might be an architectural oversight, as LobbyManager.cs is also listed under Matchmaking.
+
+    Game Server Management (GameServerManagement Directory)
+        GameServerManager.cs: Communicates with game server instances, managing their state and load balancing.
+        HeartbeatMonitor.cs: Regularly checks the status of game servers to ensure their availability.
+
+    Models (Models Directory)
+        Player.cs, Lobby.cs: Define the data structures for player and lobby data, respectively. These models are used by the database interface to interact with the database collections.
+
+    Utilities (Utilities Directory)
+        Logger.cs: Provides logging capabilities for server operations, errors, and player activities.
+        Packet.cs: Handles data packet creation, manipulation, and reading for network communication, likely used across Socket Listener, Authentication, and Matchmaking services.
+
 
 
 
@@ -208,3 +182,6 @@ This architecture aims to provide a robust, scalable, and efficient Master Serve
     Deploy on a cloud platform that supports the required infrastructure and database services.
 
 This architecture is designed to ensure that your Game Server is capable of handling multiple simultaneous game sessions efficiently, with a focus on real-time communication, scalability, and providing a seamless gaming experience.
+
+
+

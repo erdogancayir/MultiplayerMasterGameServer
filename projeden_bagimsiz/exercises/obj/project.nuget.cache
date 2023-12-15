@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+y26+TWZcbe6nQVEKj3YTQkW/8WU5BraBG/yCQO6CPLNFEE+UrdHqd/cAMeyf7STNstZdii38/2rkoIY6znw2A==",
+  "dgSpecHash": "NXXJRQdD3V6IM9m7AG/XQUxoGregAkX9zwOTE0jSC0OlQ6UEegex93ne2RI/zkZscBKptngmosYdPWuSS0Cl5A==",
   "success": true,
-  "projectFilePath": "/home/erdogancayir/Desktop/gameserver/exercises/exercises.csproj",
+  "projectFilePath": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/exercises.csproj",
   "expectedPackageFiles": [
     "/home/erdogancayir/.nuget/packages/messagepack/2.5.140/messagepack.2.5.140.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/messagepack.annotations/2.5.140/messagepack.annotations.2.5.140.nupkg.sha512",

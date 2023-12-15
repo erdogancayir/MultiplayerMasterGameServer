@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Desktop/gameserver/exercises/exercises.csproj": {}
+    "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/exercises.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Desktop/gameserver/exercises/exercises.csproj": {
+    "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/exercises.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/exercises/exercises.csproj",
+        "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/exercises.csproj",
         "projectName": "exercises",
-        "projectPath": "/home/erdogancayir/Desktop/gameserver/exercises/exercises.csproj",
+        "projectPath": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/exercises.csproj",
         "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Desktop/gameserver/exercises/obj/",
+        "outputPath": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/exercises/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

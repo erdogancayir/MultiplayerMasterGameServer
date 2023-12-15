@@ -17,9 +17,3 @@ public class GameServerManager
 
     // ... Additional methods for updating, finding, and deleting game servers ...
 }
-
-public class GameServer
-{
-    public string ServerID { get; set; }
-    // ... Other fields ...
-}

@@ -159,11 +159,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/Server/Server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/Server/Server.csproj",
       "projectName": "Server",
-      "projectPath": "/home/erdogancayir/Desktop/gameserver/Server/Server.csproj",
+      "projectPath": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/Server/Server.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Desktop/gameserver/Server/obj/",
+      "outputPath": "/home/erdogancayir/Desktop/gameserver/projeden_bagimsiz/Server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
