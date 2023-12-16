@@ -1,31 +1,42 @@
-
-using System;
 using System.Net;
 using System.Net.Sockets;
 using MessagePack;
+using Microsoft.Extensions.DependencyInjection;
 
 public class SocketListener
 {
     private readonly int _port;
-    private readonly PlayerManager _playerManager;
     private readonly TcpListener _listener;
+    private readonly IServiceProvider _serviceProvider;
+    private Dictionary<OperationType, Action<byte[], int>>? operationHandlers;
 
-    public SocketListener(int port, PlayerManager playerManager)
+    public SocketListener(int port, IServiceProvider serviceProvider)
     {
         _port = port;
-        _playerManager = playerManager;
+        _serviceProvider = serviceProvider;
         _listener = new TcpListener(IPAddress.Any, _port);
+        InitializeOperationHandlers();
     }
 
+    private void InitializeOperationHandlers()
+    {
+        var authService = _serviceProvider.GetService<IAuthService>()
+                     ?? throw new InvalidOperationException("AuthService not available.");
+
+        operationHandlers = new Dictionary<OperationType, Action<byte[], int>>
+        {
+            { OperationType.LoginRequest, authService.HandleLoginRequest },
+            { OperationType.LogoutRequest, authService.HandleLogoutRequest },
+            // ...diğer eşleştirmeler...
+        };
+    }
     public void Start()
     {
         try
         {
             _listener.Start();
             Console.WriteLine($"Listening for connections on port {_port}...");
-
-            // Start an asynchronous operation to accept client connections.
-            _listener.BeginAcceptTcpClient(new AsyncCallback(TcpConnectCallback), null);
+            BeginAcceptClient();
         }
         catch (Exception ex)
         {
@@ -33,35 +44,32 @@ public class SocketListener
         }
     }
 
+    private void BeginAcceptClient()
+    {
+        _listener.BeginAcceptTcpClient(new AsyncCallback(TcpConnectCallback), null);
+    }
+
     private void TcpConnectCallback(IAsyncResult ar)
     {
         try
         {
             TcpClient client = _listener.EndAcceptTcpClient(ar);
-
-            // Handle the new connection in a separate task
             Task.Run(() => HandleNewConnection(client));
-
-            // Continue listening for other client connections
-            _listener.BeginAcceptTcpClient(new AsyncCallback(TcpConnectCallback), null);
+            BeginAcceptClient();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error accepting client connection: {ex.Message}");
         }
     }
-    private void HandleNewConnection(TcpClient client)
+    private async Task HandleNewConnection(TcpClient client)
     {
         try
         {
             using var networkStream = client.GetStream();
-            byte[] buffer = new byte[1024]; // Adjust size as needed
-            int bytesRead;
-
-            // Read data from the stream
-            bytesRead = networkStream.Read(buffer, 0, buffer.Length);
-
-            HandleReceivedData(buffer, bytesRead);
+            byte[] buffer = new byte[1024];
+            int bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+            HandleReceivedData(buffer, bytesRead); // This is now synchronous
         }
         catch (Exception ex)
         {
@@ -77,20 +85,21 @@ public class SocketListener
     {
         try
         {
-            // Convert the byte array to a Memory<byte> for deserialization
-            var memoryData = new Memory<byte>(data, 0, bytesRead);
-
-            // Deserialize the data using MessagePack
-            var playerRequest = MessagePackSerializer.Deserialize<PlayerRequest>(memoryData);
-
-            Console.WriteLine($"Received data: {playerRequest.Id}, {playerRequest.x}, {playerRequest.y}, {playerRequest.z}");
-            // Act based on the deserialized data
-            // Example: if (playerRequest.Action == "JoinGame") { ... }
+            // Deserialize to a generic packet structure (assuming it contains an operation type)
+            var packet = MessagePackSerializer.Deserialize<GenericPacket>(new Memory<byte>(data, 0, bytesRead));
+            if (operationHandlers?.TryGetValue(packet.OperationType, out var handler) == true)
+            {
+                // Invoke the handler
+                handler(data, bytesRead);
+            }
+            else
+            {
+                Console.WriteLine($"No handler found for operation type: {packet.OperationType}");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error processing received data: {ex.Message}");
         }
     }
-
 }

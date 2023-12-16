@@ -57,6 +57,7 @@ This architecture aims to provide a robust, scalable, and efficient Master Serve
 
 nnNkralzoYbFTpxH
 
+```
 src
 ├── main
 │   ├── config
@@ -102,10 +103,11 @@ src
 │   │   │   └── SocketListener.cs
 │   │   ├── Utilities
 │   │   │   ├── Logger.cs
-│   │   │   └── Packet.cs
+│   │   │   └── OperationTypes.cs
 |   |   └── Documents
 |   |       ├── ConfigDirectoryDocument.md
 |   |       └── DatabaseDirectoryDocument.md
+```
 
 Server Components and Their Corresponding Classes
 
