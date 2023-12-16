@@ -5,11 +5,33 @@ public class LoadServerConfiguration
 
     public LoadServerConfiguration()
     {
-        // Load configurations here. This can be from a file, environment variables, etc.
-        // Example:
-        // DbConfig = LoadDatabaseConfig();
-        // ServerConfig = LoadServerConfig();
+        DbConfig = LoadDatabaseConfig();
+        ServerConfig = LoadServerConfig();
     }
 
-    // Methods to load individual configurations...
+    private DatabaseConfig LoadDatabaseConfig()
+    {
+        // Load database configuration from a file, environment variable, etc.
+        string connectionString = Environment.GetEnvironmentVariable("PANTEON_DB_CONNECTION_STRING");
+        string databaseName = Environment.GetEnvironmentVariable("PANTEON_DB_NAME");
+
+        if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(databaseName))
+        {
+            throw new InvalidOperationException("Database configuration not found.");
+        }
+        return new DatabaseConfig(connectionString, databaseName);
+    }
+
+    private ServerConfig LoadServerConfig()
+    {
+        // Load server configuration
+        // Placeholder example:
+        return new ServerConfig
+        {
+            MaxPlayersPerLobby = 10,
+            MaxLobbies = 5,
+            SocketListenerPort = 8080
+            // ...other settings
+        };
+    }
 }

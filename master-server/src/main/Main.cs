@@ -1,24 +1,39 @@
+using dotenv.net;
+
 namespace MasterServer
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Starting Master Server...");
-            // These configurations to set up database connections, server settings, etc.
-            var configLoader = new LoadServerConfiguration();
-            var dbConfig = configLoader.DbConfig;
-            var serverConfig = configLoader.ServerConfig;
-            
-            // Initialize Socket Listener
-            var socketListener = new SocketListener(serverConfig.SocketListenerPort);
-            Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");
-            socketListener.Start();
+            try 
+            {
+                DotEnv.Load();
+                Console.WriteLine("Starting Master Server...");
+                // These configurations to set up database connections, server settings, etc.
+                var configLoader = new LoadServerConfiguration();
+                var dbConfig = configLoader.DbConfig;
+                var serverConfig = configLoader.ServerConfig;
+                Console.WriteLine($"Database: {dbConfig.ConnectionString}");
+                Console.WriteLine($"Database: {dbConfig.DatabaseName}");
 
-            // Additional initializations (Authentication, GameServerManager, etc.)
+                var dbInterface = new DbInterface(dbConfig.ConnectionString, dbConfig.DatabaseName);
+                Console.WriteLine("Database connection established.");
 
-            // Keep the server running
-            KeepServerRunning();
+                var playerManager = new PlayerManager(dbInterface);
+
+                var socketListener = new SocketListener(serverConfig.SocketListenerPort, playerManager);
+                Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");
+                socketListener.Start();
+
+                // Additional initializations (Authentication, GameServerManager, etc.)
+                // Keep the server running
+                KeepServerRunning();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error starting the server: {ex.Message}");
+            }
         }
 
         private static void KeepServerRunning()

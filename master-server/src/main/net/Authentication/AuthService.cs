@@ -7,10 +7,10 @@ public class AuthService
         _dbInterface = dbInterface;
     }
 
-    public bool AuthenticatePlayer(string token)
+    public bool Authenticate(string username, string password)
     {
-        // Implement token authentication logic
-        // Example: Check token validity against the database
-        return true;
+        // Veritabanında kullanıcı adı ve şifre doğrulaması yapın
+        // Örnek: dbInterface.GetUserByUsernameAndPassword(username, password);
+        return true; // veya false, doğrulamaya bağlı
     }
 }

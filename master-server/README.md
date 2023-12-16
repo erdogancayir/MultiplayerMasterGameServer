@@ -75,7 +75,12 @@ src
 │   │   ├── Database
 │   │   │   ├── DbInterface.cs
 │   │   │   ├── GameServerManager.cs
+│   │   │   ├── GameStateManager.cs
+│   │   │   ├── GameStatisticManager.cs
 │   │   │   ├── LobbyManager.cs
+│   │   │   ├── LogManager.cs
+│   │   │   ├── MatchmakingManager.cs
+│   │   │   ├── SessionManager.cs
 │   │   │   └── PlayerManager.cs
 │   │   ├── GameServerManagement
 │   │   │   ├── GameServerManager.cs
@@ -85,6 +90,12 @@ src
 │   │   │   └── Matchmaker.cs
 │   │   ├── Models
 │   │   │   ├── Lobby.cs
+|   |   |   ├── GameServer.cs
+|   |   |   ├── GameState.cs
+|   |   |   ├── GameStatistic.cs
+|   |   |   ├── LogEntry.cs
+|   |   |   ├── Matchmaking.cs
+|   |   |   ├── Session.cs
 │   │   │   └── Player.cs
 │   │   ├── SocketListener
 │   │   │   ├── ConnectionHandler.cs

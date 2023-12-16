@@ -13,3 +13,4 @@ public class Matchmaking
     public string LobbyID { get; set; }
     public DateTime StartTime { get; set; }
     public string Status { get; set; }
+}
