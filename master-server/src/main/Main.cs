@@ -14,13 +14,12 @@ namespace MasterServer
                 var configLoader = new LoadServerConfiguration();
                 var dbConfig = configLoader.DbConfig;
                 var serverConfig = configLoader.ServerConfig;
-                Console.WriteLine($"Database: {dbConfig.ConnectionString}");
-                Console.WriteLine($"Database: {dbConfig.DatabaseName}");
 
                 var dbInterface = new DbInterface(dbConfig.ConnectionString, dbConfig.DatabaseName);
                 Console.WriteLine("Database connection established.");
 
                 var playerManager = new PlayerManager(dbInterface);
+                Console.WriteLine($"Player manager initialized.");
 
                 var socketListener = new SocketListener(serverConfig.SocketListenerPort, playerManager);
                 Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");

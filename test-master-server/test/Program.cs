@@ -17,12 +17,12 @@ public class TcpClientExample
             // Connect to the server
             await client.ConnectAsync(server, port);
 
-            // Create a request
-            var request = new PlayerRequest
+            PlayerRequest request = new PlayerRequest
             {
-                Username = "Player1",
-                Action = "JoinGame"
-                // Set other properties as needed
+                Id = 1,
+                x = 2.0f,
+                y = 3.0f,
+                z = 7.0f
             };
 
             // Serialize the request

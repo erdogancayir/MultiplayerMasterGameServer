@@ -29,7 +29,6 @@ public class SocketListener
         }
         catch (Exception ex)
         {
-            // Log the exception
             Console.WriteLine($"Error starting the server: {ex.Message}");
         }
     }
@@ -48,7 +47,6 @@ public class SocketListener
         }
         catch (Exception ex)
         {
-            // Log the exception
             Console.WriteLine($"Error accepting client connection: {ex.Message}");
         }
     }
@@ -82,10 +80,10 @@ public class SocketListener
             // Convert the byte array to a Memory<byte> for deserialization
             var memoryData = new Memory<byte>(data, 0, bytesRead);
 
-             // Deserialize the data using MessagePack
+            // Deserialize the data using MessagePack
             var playerRequest = MessagePackSerializer.Deserialize<PlayerRequest>(memoryData);
 
-            Console.WriteLine($"Received data: {playerRequest}");
+            Console.WriteLine($"Received data: {playerRequest.Id}, {playerRequest.x}, {playerRequest.y}, {playerRequest.z}");
             // Act based on the deserialized data
             // Example: if (playerRequest.Action == "JoinGame") { ... }
         }
