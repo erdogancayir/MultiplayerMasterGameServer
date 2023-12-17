@@ -86,6 +86,7 @@ public class SocketListener
             TcpClient client = _listener.EndAcceptTcpClient(ar);
             string connectionId = Guid.NewGuid().ToString();
 
+            //son iki parametre eklendi
             var clientConnection = new ClientConnectionHandler(client, operationHandlers, _connectionManager, connectionId);
             
             _connectionManager.AddConnection(connectionId, client);
