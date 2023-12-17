@@ -20,42 +20,40 @@
     Server Allocation: Once a game lobby is full, players are assigned to a game server.
     Game Server Status: The Master Server monitors game server statuses and handles server disconnections or failures.
 
-2. Communication Protocols
+Communication Protocols
 
     Use TCP or UDP based on your game's needs (TCP for reliability, UDP for speed).
     Implement a custom protocol for efficient data transfer using the "Message Pack" library. Structure your packets with a header containing information like packet format, data size, data type ID, followed by the actual data payload.
 
-3. Scalability and Reliability
+Scalability and Reliability
 
     Load Balancing: Implement load balancing to distribute player connections across multiple instances of the Master Server if needed.
     Fault Tolerance: Implement failover mechanisms for handling server crashes or disconnections. This includes rerouting players to other game servers if one fails.
     Database Replication: Use database replication for high availability and data redundancy.
 
-4. Security Considerations
+Security Considerations
 
     Implement secure authentication mechanisms to prevent unauthorized access.
     Encrypt sensitive data during transmission.
     Regularly update and patch server software to protect against vulnerabilities.
 
-5. Monitoring and Logging
+Monitoring and Logging
 
     Implement logging for tracking player activities, server performance, and error logs.
     Use monitoring tools to keep track of server health, resource usage, and performance metrics.
 
-6. Development and Deployment
+Development and Deployment
 
     Develop the Master Server as a .NET application.
     Containerize the server application for easy deployment and scaling.
     Deploy on a cloud platform with support for Linux/Windows environments and NoSQL databases.
 
-7. Bonus Objective: Multi-Server Continuity
+Bonus Objective: Multi-Server Continuity
 
     Implement a system where game state is regularly saved or replicated across multiple game servers.
     In case of a game server failure, seamlessly transfer players to an available server without losing game progress.
 
 This architecture aims to provide a robust, scalable, and efficient Master Server for your multiplayer game, ensuring smooth player experiences during login, matchmaking, and transitioning to game servers.
-
-nnNkralzoYbFTpxH
 
 ```
 src
@@ -72,6 +70,7 @@ src
 │   ├── net
 │   │   ├── Authentication
 │   │   │   ├── AuthService.cs
+│   │   │   ├── InMemoryTokenStorage.cs
 │   │   │   └── TokenManager.cs
 │   │   ├── Database
 │   │   │   ├── DbInterface.cs
@@ -83,6 +82,16 @@ src
 │   │   │   ├── MatchmakingManager.cs
 │   │   │   ├── SessionManager.cs
 │   │   │   └── PlayerManager.cs
+|   |   ├── Database
+│   │   │   ├── AuthenticationPack.cs
+│   │   │   ├── BasePack.cs
+│   │   │   ├── GameServerAllocationPack.cs
+│   │   │   ├── GameStatePack.cs
+│   │   │   ├── GenericMessagePack.cs
+│   │   │   ├── HeartbeatPack.cs
+│   │   │   ├── LobbyStatusUpdatePack.cs
+│   │   │   ├── MatchmakingPack.cs
+│   │   │   └── SignUpPack.cs
 │   │   ├── GameServerManagement
 │   │   │   ├── GameServerManager.cs
 │   │   │   └── HeartbeatMonitor.cs

@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using Amazon.Runtime.Internal.Util;
 using MessagePack;
 
 public interface IAuthService
@@ -40,7 +41,6 @@ public class AuthService : IAuthService
             var signUpRequest = MessagePackSerializer.Deserialize<SignUpRequest>(data);
             var response = new SignUpResponse();
             response.OperationTypeId = (int)OperationType.SignUpResponse;
-            Console.WriteLine($"Username: { response.OperationTypeId }");
             if (!await _playerManager.IsUsernameAvailable(signUpRequest.Username))
             {
                 response.Success = false;
@@ -91,14 +91,13 @@ public class AuthService : IAuthService
             response.OperationTypeId = (int)OperationType.LoginResponse;
             // Validate the username and password
             var player = await _playerManager.GetPlayerByUsernameAsync(loginRequest.Username);
-            Console.WriteLine($"Username: { loginRequest.Username }");
             if (player != null && _playerManager.ValidatePassword(player.PasswordHash, loginRequest.Password))
             {
                 response.Success = true;
                 response.Token = _playerManager.GenerateToken(player);
-                Console.WriteLine($"Token: { response.Token }");
                 response.Message = "Login successful.";
                 Console.WriteLine(response.Message);
+                await _logManager.CreateLogAsync("Info", $"Player logged in: {loginRequest.Username}", player.PlayerID);
             }
             else
             {

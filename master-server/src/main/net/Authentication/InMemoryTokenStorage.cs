@@ -5,6 +5,10 @@ public class InMemoryTokenStorage : ITokenStorage
     public void StoreToken(string playerId, string token)
     {
         _tokens[playerId] = token;
+        foreach (var kv in _tokens)
+        {
+            Console.WriteLine($"11_tokens ${kv.Key} ${kv.Value}");
+        }
     }
 
     public bool IsTokenValid(string token)

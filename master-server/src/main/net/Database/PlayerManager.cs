@@ -115,6 +115,6 @@ public class PlayerManager
     {
         _tokenManager.InvalidateToken(playerId);
         // Burada loglama yapılabilir.
-        await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}");    
+        await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}", playerId);    
     }
 }
