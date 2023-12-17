@@ -29,6 +29,12 @@ public class PlayerManager
         return await _players.Find(p => p.PlayerID == playerId).FirstOrDefaultAsync();
     }
 
+    public async Task<string> GetPlayerIdByUsername(string username)
+    {
+        var player = await _players.Find(p => p.Username == username).FirstOrDefaultAsync();
+        return player.PlayerID ?? throw new NullReferenceException("Player ID is null.");
+    }
+
     /// <summary>
     /// Checks if a username is available.
     /// </summary>

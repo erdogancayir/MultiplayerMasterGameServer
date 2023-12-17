@@ -6,12 +6,26 @@ public class ClientConnectionHandler
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
     private readonly Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
+    private ConnectionManager _connectionManager;
+    private string _connectionId;
 
-    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers)    {
+    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers, ConnectionManager connectionManager, string connectionId)    {
         _client = client;
         //using var networkStream = client.GetStream();
         _stream = client.GetStream();
         _operationHandlers = operationHandlers;
+        _connectionManager = connectionManager;
+        _connectionId = connectionId;
+    }
+
+    /// <summary>
+    /// Updates the connection id of the client.
+    /// </summary>
+    /// <param name="newPlayerId"></param>
+    public void UpdateConnectionId(string newPlayerId)
+    {
+        _connectionManager.UpdateConnectionId(_connectionId, newPlayerId);
+        _connectionId = newPlayerId;
     }
 
     /// <summary>
@@ -35,6 +49,7 @@ public class ClientConnectionHandler
         finally
         {
             //client.Close();
+            //_connectionManager.RemoveConnection(_connectionId);
         }
     }
 

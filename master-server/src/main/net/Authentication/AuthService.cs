@@ -14,16 +14,18 @@ public class AuthService : IAuthService
 {
     private readonly PlayerManager _playerManager;
     private readonly LogManager _logManager;
+    private readonly ConnectionManager _connectionManager;
 
     /// <summary>
     /// Initializes a new instance of the AuthService class.
     /// </summary>
     /// <param name="playerManager">The PlayerManager instance for handling player-related operations.</param>
     /// <param name="logManager">The LogManager for logging activities.</param>
-    public AuthService(PlayerManager playerManager, LogManager logManager)
+    public AuthService(PlayerManager playerManager, LogManager logManager, ConnectionManager connectionManager)
     {
         _playerManager = playerManager;
         _logManager = logManager;
+        _connectionManager = connectionManager;
     }
 
 
@@ -45,6 +47,8 @@ public class AuthService : IAuthService
             {
                 response.Success = false;
                 response.Message = "Username already taken";
+                var playerId = _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
+                _connectionManager.UpdateConnectionId(playerId);
                 Console.WriteLine(response.Message);
             }
             else

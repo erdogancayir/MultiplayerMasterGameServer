@@ -8,6 +8,7 @@ public class SocketListener
     private readonly int _port;
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ConnectionManager _connectionManager;
     private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
     
     /// <summary>
@@ -20,6 +21,8 @@ public class SocketListener
         _port = port;
         _serviceProvider = serviceProvider;
         _listener = new TcpListener(IPAddress.Any, _port);
+        _connectionManager = _serviceProvider.GetService<ConnectionManager>()
+                     ?? throw new InvalidOperationException("ConnectionManager not available.");
         InitializeOperationHandlers();
     }
 
@@ -81,7 +84,12 @@ public class SocketListener
         try
         {
             TcpClient client = _listener.EndAcceptTcpClient(ar);
-            var clientConnection = new ClientConnectionHandler(client, operationHandlers);
+            string connectionId = Guid.NewGuid().ToString();
+
+            var clientConnection = new ClientConnectionHandler(client, operationHandlers, _connectionManager, connectionId);
+            
+            _connectionManager.AddConnection(connectionId, client);
+
             Task.Run(() => clientConnection.HandleNewConnection());
             //Task.Run(() => HandleNewConnection(client));
             BeginAcceptClient();

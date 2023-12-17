@@ -78,7 +78,7 @@ public class Matchmaker
                 };
 
                 await lobbyManager.CreateLobby(newLobby);
-                NotifyPlayersAboutLobbyAssignment(playersForMatch, newLobby);
+                await NotifyPlayersAboutLobbyAssignment(playersForMatch, newLobby);
             }
         }
     }
@@ -89,14 +89,36 @@ public class Matchmaker
     }
 
 
-    private void NotifyPlayersAboutLobbyAssignment(List<Player> players, Lobby lobby)
+    private async Task NotifyPlayersAboutLobbyAssignment(List<Player> players, Lobby lobby)
     {
         foreach (var player in players)
         {
-            // Implement the logic to notify players
-            // This could be a message over a network stream, an event, etc.
-            // Example: SendMatchmakingResponse(player, lobby);
+            // Oyuncuya lobi ataması hakkında bilgi gönder
+            var matchmakingResponse = new MatchmakingResponse
+                {
+                    OperationTypeId = (int)OperationType.MatchmakingResponse,
+                    Success = true,
+                    LobbyID = lobby.LobbyID,
+                    PlayerIDs = lobby.Players,
+                    Status = lobby.Status
+                };
+
+            // Oyuncunun ağ stream'ini bul (örneğin, oyuncunun sunucu ile olan bağlantısı)
+            NetworkStream playerStream = GetPlayerStream(player.PlayerID ?? string.Empty);
+
+            if (playerStream != null)
+            {
+                var responseData = MessagePackSerializer.Serialize(matchmakingResponse);
+                await playerStream.WriteAsync(responseData, 0, responseData.Length);
+            }
         }
+    }
+
+    private NetworkStream GetPlayerStream(string playerId)
+    {
+        // Oyuncunun sunucu ile olan ağ bağlantısını döndürür
+        // Bu, uygulamanızın nasıl tasarlandığına bağlıdır
+        // Örnek: return playerConnections[playerId].Stream;
     }
 
     private async Task SendMessage(NetworkStream stream, BasePack response)
@@ -105,5 +127,4 @@ public class Matchmaker
         await stream.WriteAsync(responseData, 0, responseData.Length);
     }
 
-    // ... Additional methods and logic ...
 }
