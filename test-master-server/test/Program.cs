@@ -23,7 +23,7 @@ public class TcpClientExample
                     var signUpRequest = new SignUpRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "admin",
+                        Username = "3232gg",
                         Password = "password"
                     };
                     dataToSend = MessagePackSerializer.Serialize(signUpRequest);
@@ -33,10 +33,18 @@ public class TcpClientExample
                     var authenticationRequest = new AuthenticationRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "admin",
+                        Username = "3232gg",
                         Password = "password"
                     };
                     dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
+                    break;
+                case OperationType.LogoutRequest:
+                    var logoutRequest = new LogoutRequest
+                    {
+                        OperationTypeId = (int)operationType,
+                        Username = "3232gg"
+                    };
+                    dataToSend = MessagePackSerializer.Serialize(logoutRequest);
                     break;
                 default:
                     throw new InvalidOperationException("Unsupported operation type.");
@@ -69,6 +77,10 @@ public class TcpClientExample
                             var authenticationResponse = MessagePackSerializer.Deserialize<AuthenticationResponse>(buffer);
                             Console.WriteLine($"Login Response: Token = {authenticationResponse.Token}, ErrorMessage = {authenticationResponse.ErrorMessage}");
                             break;
+                        case OperationType.LogoutResponse:
+                            var logoutResponse = MessagePackSerializer.Deserialize<LogoutResponse>(buffer);
+                            Console.WriteLine($"Logout Response: Success = {logoutResponse.Success}, ErrorMessage = {logoutResponse.ErrorMessage}");
+                            break;
                     }
                 }
                 catch (Exception ex)
@@ -91,6 +103,6 @@ public class TcpClientExample
     {
         await SendRequest(OperationType.SignUpRequest);
         await SendRequest(OperationType.LoginRequest);
-        //await SendRequest(OperationType.LogoutRequest);
+        await SendRequest(OperationType.LogoutRequest);
     }
 }

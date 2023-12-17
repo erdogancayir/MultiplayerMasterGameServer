@@ -1,5 +1,4 @@
 using MongoDB.Driver;
-using System.Threading.Tasks;
 
 public class LobbyManager
 {
@@ -15,5 +14,22 @@ public class LobbyManager
         await _lobbies.InsertOneAsync(lobby);
     }
 
-    // ... Additional methods for updating, finding, and deleting lobbies ...
+    public async Task UpdateLobby(string lobbyID, string newStatus)
+    {
+        var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyID);
+        var update = Builders<Lobby>.Update.Set(l => l.Status, newStatus);
+        await _lobbies.UpdateOneAsync(filter, update);
+    }
+
+    public async Task<Lobby> FindLobby(string lobbyID)
+    {
+        return await _lobbies.Find(l => l.LobbyID == lobbyID).FirstOrDefaultAsync();
+    }
+
+    public async Task DeleteLobby(string lobbyID)
+    {
+        await _lobbies.DeleteOneAsync(l => l.LobbyID == lobbyID);
+    }
+
+    // ... Additional methods ...
 }

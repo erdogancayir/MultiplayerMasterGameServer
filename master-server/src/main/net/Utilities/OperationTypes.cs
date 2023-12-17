@@ -10,8 +10,9 @@ public enum OperationType
     SignUpResponse = 106,
     // Matchmaking Operations
     JoinLobbyRequest = 200,
-    LeaveLobbyRequest = 201,
-    MatchmakingResponse = 202,
+    JoinLobbyResponse = 201,
+    LeaveLobbyRequest = 202,
+    MatchmakingResponse = 203,
 
     // Lobby Management
     UpdateLobbyStatus = 300,

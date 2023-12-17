@@ -32,3 +32,16 @@ public class LogoutRequest : BasePack
     [Key(1)]
     public string? Username { get; set; }
 }
+
+[MessagePackObject]
+public class LogoutResponse : BasePack
+{
+    [Key(1)]
+    public bool Success { get; set; } = false; // Varsayılan başarı durumu.
+
+    [Key(2)]
+    public string? ErrorMessage { get; set; } // Error message if logout fails.
+
+    [Key(3)]
+    public string Message { get; set; }  = "Operation not completed";
+}

@@ -13,4 +13,5 @@ public class Session
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; } // Nullable for ongoing sessions
     public bool IsActive { get; set; }
+    public DateTime LastActivityTime { get; set; }
 }

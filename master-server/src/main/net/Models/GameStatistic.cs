@@ -9,6 +9,4 @@ public class GameStatistic
 
     public string PlayerID { get; set; }
     public string GameID { get; set; }
-    // Define specific statistics data structure here
-    // e.g., Wins, Losses, Scores, etc.
 }

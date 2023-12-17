@@ -117,4 +117,10 @@ public class PlayerManager
         // Burada loglama yapılabilir.
         await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}", playerId);    
     }
+
+    public async Task<List<Player>> GetPlayersByIdsAsync(List<string> playerIds)
+    {
+        var filter = Builders<Player>.Filter.In(p => p.PlayerID, playerIds);
+        return await _players.Find(filter).ToListAsync();
+    }
 }

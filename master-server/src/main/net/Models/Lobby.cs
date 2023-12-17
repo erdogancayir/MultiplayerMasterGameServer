@@ -11,7 +11,7 @@ public class Lobby
 
     public List<string> Players { get; set; } // List of PlayerIDs
     public string Status { get; set; } // e.g., Waiting, Full, InGame
-    public string GameType { get; set; }
+    public string GameType { get; set; } // if more than one game type is supported
     public DateTime CreationTime { get; set; }
     public int MaxPlayers { get; set; }
 }

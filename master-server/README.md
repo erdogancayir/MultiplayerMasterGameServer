@@ -96,7 +96,6 @@ src
 │   │   │   ├── GameServerManager.cs
 │   │   │   └── HeartbeatMonitor.cs
 │   │   ├── Matchmaking
-│   │   │   ├── LobbyManager.cs
 │   │   │   └── Matchmaker.cs
 │   │   ├── Models
 │   │   │   ├── Lobby.cs
@@ -117,6 +116,28 @@ src
 |   |       ├── ConfigDirectoryDocument.md
 |   |       └── DatabaseDirectoryDocument.md
 ```
+
+Matchmaker Workflow
+
+    Player Queueing:
+        Players can request to join a matchmaking queue by sending a JoinLobbyRequest.
+        The Matchmaker adds these players to the matchmakingQueue.
+
+    Matchmaking Process:
+        Periodically, or whenever a new player is added, Matchmaker checks if there are enough players in the queue to form a match (requiredPlayersForMatch).
+        This check is done in TryCreateMatch.
+
+    Lobby Creation:
+        Once enough players are in the queue, Matchmaker dequeues the required number of players and creates a new Lobby with these players.
+        The Lobby status is initially set to "Waiting".
+
+    Notifying Players:
+        After creating a new Lobby, Matchmaker should notify the dequeued players that they have been placed in a lobby.
+        This can be done by sending a MatchmakingResponse to each player with the details of the lobby they've been assigned to.
+
+    Lobby Management:
+        Players can send a LeaveLobbyRequest if they decide to leave the lobby before a game starts.
+        The LobbyManager can update lobby statuses, such as when a game is starting (StartGameCountdown), or if a lobby's status changes (UpdateLobbyStatus).
 
 Server Components and Their Corresponding Classes
 

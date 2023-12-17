@@ -84,7 +84,17 @@ namespace MasterServer
             services.AddSingleton<IAuthService, AuthService>(provider =>
                 new AuthService(provider.GetRequiredService<PlayerManager>(), provider.GetRequiredService<LogManager>()));
 
-            services.AddSingleton<Matchmaker>();
+            // Register LobbyManager with DbInterface dependency
+            services.AddSingleton<LobbyManager>(provider =>
+                new LobbyManager(provider.GetRequiredService<DbInterface>()));
+
+            // Register Matchmaker with LobbyManager dependency
+            services.AddSingleton<Matchmaker>(provider =>
+                new Matchmaker(provider.GetRequiredService<LobbyManager>(),
+                    provider.GetRequiredService<TokenManager>(),
+                    provider.GetRequiredService<PlayerManager>()
+                ));
+
             // ...other service registrations...
         }
 

@@ -39,7 +39,7 @@ public class LogoutRequest : BasePack
 public class LogoutResponse : BasePack
 {
     [Key(1)]
-    public bool Success { get; set; } = false; // Varsayılan başarı durumu.
+    public bool Success { get; set; } = false;
 
     [Key(2)]
     public string? ErrorMessage { get; set; } // Error message if logout fails.

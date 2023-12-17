@@ -31,6 +31,10 @@ public class SocketListener
         // Retrieves the authentication service from the service provider or throws an exception if not available.
         var authService = _serviceProvider.GetService<IAuthService>()
                      ?? throw new InvalidOperationException("AuthService not available.");
+        var lobbyManager = _serviceProvider.GetService<LobbyManager>()
+                     ?? throw new InvalidOperationException("LobbyManager not available.");
+        var matchmaker = _serviceProvider.GetService<Matchmaker>()
+                     ?? throw new InvalidOperationException("Matchmaker not available.");
 
         // Mapping each operation type to its corresponding handler.
         operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
@@ -38,6 +42,7 @@ public class SocketListener
             { OperationType.LoginRequest, authService.HandleLoginRequest },
             { OperationType.LogoutRequest, authService.HandleLogoutRequest },
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
+            { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             // ... other mappings ...
         };
     }
@@ -87,95 +92,4 @@ public class SocketListener
         }
     }
 
-    /// <summary>
-    /// Handles a new client connection.
-    /// </summary>
-    /// <param name="client">The client that has connected to the server.</param>
-    private async Task HandleNewConnection(TcpClient client)
-    {
-        Console.WriteLine($"Client dwdwdwdwdwd: {client.Client.RemoteEndPoint}");
-        try
-        {
-            // Establishes a network stream with the connected client for data communication.
-            //using var networkStream = client.GetStream();
-            var networkStream = client.GetStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
-            // Processes the received data.
-            HandleReceivedData(networkStream, buffer, bytesRead); // This is now synchronous
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error handling client connection: {ex.Message}");
-        }
-        finally
-        {
-            //client.Close();
-        }
-    }
-
-    /// <summary>
-    /// Processes the received data from a connected client.
-    /// </summary>
-    /// <param name="data">The received data as a byte array.</param>
-    /// <param name="bytesRead">The number of bytes actually read from the network stream.</param>
-    private void HandleReceivedData(NetworkStream stream, byte[] data, int bytesRead)
-    {
-        // Check if the received data is less than the size of an integer.
-        if (bytesRead < sizeof(int))
-        {
-            Console.WriteLine("Received data is too short.");
-            return;
-        }
-        try
-        {
-            // Deserialize the data into a BasePack object to extract the OperationType.
-            var basePack = MessagePackSerializer.Deserialize<BasePack>(data);
-            OperationType operationType = (OperationType)basePack.OperationTypeId;
-            Console.WriteLine($"OperationType: {operationType}");
-
-            // Check if the operation type is defined in the OperationType enum.
-            if (!Enum.IsDefined(typeof(OperationType), operationType))
-            {
-                Console.WriteLine($"Invalid OperationType received: {operationType}");
-                return;
-            }
-
-            // Call the appropriate handler based on the OperationType.
-            InvokeHandlerForOperationType(stream, operationType, data, bytesRead);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deserializing operation type: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Invokes the handler associated with the specified operation type.
-    /// </summary>
-    /// <param name="operationType">The operation type to handle.</param>
-    /// <param name="data">The received data as a byte array.</param>
-    /// <param name="bytesRead">The number of bytes read from the network stream.</param>
-    private void InvokeHandlerForOperationType(NetworkStream stream, OperationType operationType, byte[] data, int bytesRead)
-    {
-        // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
-        var handler = operationHandlers?.TryGetValue(operationType, out var tempHandler) == true ? tempHandler : null;
-
-        if (handler != null)
-        {
-            try
-            {
-                // Call the handler with the received data and byte count.
-                handler(stream, data, bytesRead);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error executing handler for operation {operationType}: {ex.Message}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"No handler found for operation type: {operationType}");
-        }
-    }
 }

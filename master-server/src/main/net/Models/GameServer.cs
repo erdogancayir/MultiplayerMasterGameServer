@@ -13,4 +13,6 @@ public class GameServer
     public int CurrentLoad { get; set; }
     public int MaxCapacity { get; set; }
     public string LastHeartbeatTime { get; set; }
+    public string? Region { get; set; }
+    public DateTime CreationTime { get; set; }
 }
