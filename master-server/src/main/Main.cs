@@ -63,9 +63,22 @@ namespace MasterServer
             // Register LogManager
             services.AddSingleton<LogManager>();
 
-            // Register PlayerManager with LogManager dependency
+             // Register the implementation of ITokenStorage
+            services.AddSingleton<ITokenStorage, InMemoryTokenStorage>();
+
+            var randomKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+
+            // Register TokenManager with its dependencies
+            services.AddSingleton<TokenManager>(provider => 
+                new TokenManager(provider.GetRequiredService<ITokenStorage>(), randomKey));
+
+            // Register PlayerManager with LogManager, TokenManager, and DbInterface dependencies
             services.AddSingleton<PlayerManager>(provider => 
-                new PlayerManager(provider.GetRequiredService<DbInterface>(), provider.GetRequiredService<LogManager>()));
+                new PlayerManager(
+                    provider.GetRequiredService<DbInterface>(), 
+                    provider.GetRequiredService<LogManager>(),
+                    provider.GetRequiredService<TokenManager>()
+                ));
 
             // Register AuthService with LogManager dependency
             services.AddSingleton<IAuthService, AuthService>(provider =>

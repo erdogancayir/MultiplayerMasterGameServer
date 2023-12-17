@@ -1,22 +1,22 @@
 using MongoDB.Driver;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 public class PlayerManager
 {
     private readonly IMongoCollection<Player> _players;
     private readonly LogManager _logManager;
 
+    private readonly TokenManager _tokenManager;
+
     // <summary>
     /// Initializes a new instance of the PlayerManager class.
     /// </summary>
     /// <param name="dbInterface">The database interface for accessing the players collection.</param>
     /// <param name="logManager">The LogManager for logging activities.</param>
-    public PlayerManager(DbInterface dbInterface, LogManager logManager)
+    public PlayerManager(DbInterface dbInterface, LogManager logManager, TokenManager tokenManager)
     {
         _players = dbInterface.GetCollection<Player>("Players");
         _logManager = logManager;
+        _tokenManager = tokenManager;
     }
 
     /// <summary>
@@ -106,9 +106,15 @@ public class PlayerManager
     /// Generates a simple token for authentication purposes.
     /// </summary>
     /// <returns>A newly generated token.</returns>
-    public string GenerateToken()
+    public string GenerateToken(Player player)
     {
-        Guid token = Guid.NewGuid();
-        return token.ToString();
+        return _tokenManager.GenerateToken(player);
+    }
+
+    public async void InvalidateToken(string playerId)
+    {
+        _tokenManager.InvalidateToken(playerId);
+        // Burada loglama yapılabilir.
+        await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}");    
     }
 }

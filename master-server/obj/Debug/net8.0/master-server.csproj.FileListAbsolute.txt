@@ -36,3 +36,11 @@
 /home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.dll
 /home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/BCrypt.Net-Next.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/IdentityModel.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/JWT.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/Newtonsoft.Json.dll
+/home/erdogancayir/Desktop/gameserver/master-server/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll

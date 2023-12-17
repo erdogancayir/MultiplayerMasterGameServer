@@ -12,8 +12,8 @@ public class LoadServerConfiguration
     private DatabaseConfig LoadDatabaseConfig()
     {
         // Load database configuration from a file, environment variable, etc.
-        string connectionString = Environment.GetEnvironmentVariable("PANTEON_DB_CONNECTION_STRING");
-        string databaseName = Environment.GetEnvironmentVariable("PANTEON_DB_NAME");
+        string? connectionString = Environment.GetEnvironmentVariable("PANTEON_DB_CONNECTION_STRING");
+        string? databaseName = Environment.GetEnvironmentVariable("PANTEON_DB_NAME");
 
         if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(databaseName))
         {
@@ -30,7 +30,8 @@ public class LoadServerConfiguration
         {
             MaxPlayersPerLobby = 10,
             MaxLobbies = 5,
-            SocketListenerPort = 8080
+            SocketListenerPort = 8080,
+            JwtSecretKey = "secret-key"
             // ...other settings
         };
     }

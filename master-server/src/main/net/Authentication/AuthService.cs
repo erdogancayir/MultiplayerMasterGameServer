@@ -95,7 +95,7 @@ public class AuthService : IAuthService
             if (player != null && _playerManager.ValidatePassword(player.PasswordHash, loginRequest.Password))
             {
                 response.Success = true;
-                response.Token = _playerManager.GenerateToken();
+                response.Token = _playerManager.GenerateToken(player);
                 Console.WriteLine($"Token: { response.Token }");
                 response.Message = "Login successful.";
                 Console.WriteLine(response.Message);
@@ -117,8 +117,43 @@ public class AuthService : IAuthService
         }
     }
 
-    public void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int bytesRead)
+    public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int bytesRead)
     {
-        // Process logout request
+        try
+        {
+            Console.WriteLine("Logout request received.");
+            // Deserialize the received data into a LogoutRequest object
+            var logoutRequest = MessagePackSerializer.Deserialize<LogoutRequest>(data);
+            var response = new LogoutResponse();
+            response.OperationTypeId = (int)OperationType.LogoutResponse;
+            // Assuming you have a method in PlayerManager to get the player's ID by username
+            var player = await _playerManager.GetPlayerByUsernameAsync(logoutRequest.Username);
+            if (player != null)
+            {
+                // Invalidate the token
+                _playerManager.InvalidateToken(player.PlayerID ?? string.Empty);
+                response.Success = true;
+                response.Message = "Logout successful.";
+                Console.WriteLine($"Token invalidated for user: {logoutRequest.Username}");
+                // You can also send a response back to the client if needed
+            }
+            else
+            {
+                response.Success = false;
+                response.ErrorMessage = "Invalid username.";
+                Console.WriteLine("Invalid username.");
+                // Handle the case where the username is not found
+            }
+
+            // Serialize the response object and send it back to the client
+            var responseData = MessagePackSerializer.Serialize(response);
+            await clientStream.WriteAsync(responseData, 0, responseData.Length);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing logout request: {ex.Message}");
+            // Handle exceptions and possibly send an error response to the client
+        }
     }
+
 }
