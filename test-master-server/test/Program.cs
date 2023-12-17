@@ -14,27 +14,24 @@ public class TcpClientExample
 
         try
         {
-            // Connect to the server
             await client.ConnectAsync(server, port);
 
-            PlayerRequest request = new PlayerRequest
-            {
-                Id = 1,
-                x = 2.0f,
-                y = 3.0f,
-                z = 7.0f
-            };
+        // SignUpRequest nesnesi oluştur
+        var signUpRequest = new SignUpRequest
+        {
+            OperationTypeId = 103, // SignUpRequest için OperationTypeId
+            Username = "exampleUser",
+            Email = "user@example.com",
+            Password = "securePassword123"
+        };
 
-            // Serialize the request
-            byte[] dataToSend = MessagePackSerializer.Serialize(request);
+        // Nesneyi serileştir
+        byte[] dataToSend = MessagePackSerializer.Serialize(signUpRequest);
 
-            // Get the network stream
-            NetworkStream stream = client.GetStream();
-
-            // Send the serialized data
-            await stream.WriteAsync(dataToSend, 0, dataToSend.Length);
-
-            Console.WriteLine("Data sent to the server.");
+        // Veri akışını al ve veriyi gönder
+        NetworkStream stream = client.GetStream();
+        await stream.WriteAsync(dataToSend, 0, dataToSend.Length);
+        Console.WriteLine("SignUpRequest sunucuya gönderildi.");
         }
         catch (Exception ex)
         {

@@ -4,18 +4,18 @@ public interface IAuthService
 {
     void HandleLoginRequest(byte[] data, int bytesRead);
     void HandleLogoutRequest(byte[] data, int bytesRead);
+    void HandleSignUpRequest(byte[] data, int bytesRead);
     // Diğer metodlar...
 }
 
 public class AuthService : IAuthService
 {
-    private readonly DbInterface _dbInterface;
+    private readonly PlayerManager _playerManager;
 
-    public AuthService(DbInterface dbInterface)
+    public AuthService(PlayerManager playerManager)
     {
-        _dbInterface = dbInterface;
+        _playerManager = playerManager;
     }
-
     public bool Authenticate(string username, string password)
     {
         // Veritabanında kullanıcı adı ve şifre doğrulaması yapın
@@ -23,12 +23,18 @@ public class AuthService : IAuthService
         return true; // veya false, doğrulamaya bağlı
     }
 
+    public async void HandleSignUpRequest(byte[] data, int bytesRead)
+    {
+        var signUpRequest = MessagePackSerializer.Deserialize<SignUpRequest>(data);
+        Console.WriteLine($"Received SignUpRequest for {signUpRequest.Username}.");
+        // Kullanıcı kayıt işlemini gerçekleştirin
+        // Örneğin: Kullanıcı adı kontrolü, şifre hashleme, veritabanına ekleme, vb.
+        // Sonra SignUpResponse döndürün
+    }
+
     public void HandleLoginRequest(byte[] data, int bytesRead)
     {
-        // Process login request
-        Console.WriteLine("Login request received.");
-        PlayerRequest a = MessagePackSerializer.Deserialize<PlayerRequest>(data);
-        Console.WriteLine($"Data received: {a.Id}, {a.x}, {a.y}, {a.z}");
+
     }
 
     public void HandleLogoutRequest(byte[] data, int bytesRead)

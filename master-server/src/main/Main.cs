@@ -10,23 +10,29 @@ namespace MasterServer
         {
             try 
             {
+                // Load environment variables from .env file
                 DotEnv.Load();
                 Console.WriteLine("Starting Master Server...");
 
+                // Set up dependency injection
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);
 
+                // Build the service provider
                 var serviceProvider = serviceCollection.BuildServiceProvider();
+
+                // Retrieve server configuration
                 var serverConfig = serviceProvider.GetService<ServerConfig>();
                 if (serverConfig == null)
                 {
                     throw new InvalidOperationException("Server configuration could not be loaded.");
                 }
+
+                // Initialize and start the socket listener
                 var socketListener = new SocketListener(serverConfig.SocketListenerPort, serviceProvider);
                 Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");
                 socketListener.Start();
 
-                // Additional initializations (Authentication, GameServerManager, etc.)
                 // Keep the server running
                 KeepServerRunning();
             }
@@ -36,6 +42,10 @@ namespace MasterServer
             }
         }
 
+        /// <summary>
+        /// Configures services for dependency injection.
+        /// </summary>
+        /// <param name="services">The collection of services.</param>
         private static void ConfigureServices(IServiceCollection services)
         {
             // Load configurations
@@ -50,14 +60,17 @@ namespace MasterServer
             // Register DbInterface with necessary parameters
             services.AddSingleton<DbInterface>(provider => new DbInterface(dbConnectionString, dbName));
             
-            // Register other services
-            services.AddSingleton<IAuthService, AuthService>();
+            // Register other services like PlayerManager, AuthService, Matchmaker, etc.
             services.AddSingleton<PlayerManager>();
+            services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<Matchmaker>();
             // ...other service registrations...
         }
 
 
+        /// <summary>
+        /// Keeps the server running, handling logic for a graceful shutdown.
+        /// </summary>
         private static void KeepServerRunning()
         {
             // Logic to keep the server running, handle graceful shutdown, etc.
