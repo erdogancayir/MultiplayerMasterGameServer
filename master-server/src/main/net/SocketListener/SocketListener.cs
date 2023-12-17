@@ -8,7 +8,7 @@ public class SocketListener
     private readonly int _port;
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
-    private Dictionary<OperationType, Action<byte[], int>>? operationHandlers;
+    private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
 
     /// <summary>
     /// Initializes a new instance of the SocketListener class.
@@ -33,7 +33,7 @@ public class SocketListener
                      ?? throw new InvalidOperationException("AuthService not available.");
 
         // Mapping each operation type to its corresponding handler.
-        operationHandlers = new Dictionary<OperationType, Action<byte[], int>>
+        operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
         {
             { OperationType.LoginRequest, authService.HandleLoginRequest },
             { OperationType.LogoutRequest, authService.HandleLogoutRequest },
@@ -91,14 +91,16 @@ public class SocketListener
     /// <param name="client">The client that has connected to the server.</param>
     private async Task HandleNewConnection(TcpClient client)
     {
+        Console.WriteLine($"Client connected: {client.Client.RemoteEndPoint}");
         try
         {
             // Establishes a network stream with the connected client for data communication.
-            using var networkStream = client.GetStream();
+            //using var networkStream = client.GetStream();
+            var networkStream = client.GetStream();
             byte[] buffer = new byte[1024];
             int bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
             // Processes the received data.
-            HandleReceivedData(buffer, bytesRead); // This is now synchronous
+            HandleReceivedData(networkStream, buffer, bytesRead); // This is now synchronous
         }
         catch (Exception ex)
         {
@@ -106,7 +108,7 @@ public class SocketListener
         }
         finally
         {
-            client.Close();
+            //client.Close();
         }
     }
 
@@ -115,7 +117,7 @@ public class SocketListener
     /// </summary>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes actually read from the network stream.</param>
-    private void HandleReceivedData(byte[] data, int bytesRead)
+    private void HandleReceivedData(NetworkStream stream, byte[] data, int bytesRead)
     {
         // Check if the received data is less than the size of an integer.
         if (bytesRead < sizeof(int))
@@ -139,7 +141,7 @@ public class SocketListener
             }
 
             // Call the appropriate handler based on the OperationType.
-            InvokeHandlerForOperationType(operationType, data, bytesRead);
+            InvokeHandlerForOperationType(stream, operationType, data, bytesRead);
         }
         catch (Exception ex)
         {
@@ -153,7 +155,7 @@ public class SocketListener
     /// <param name="operationType">The operation type to handle.</param>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes read from the network stream.</param>
-    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, int bytesRead)
+    private void InvokeHandlerForOperationType(NetworkStream stream, OperationType operationType, byte[] data, int bytesRead)
     {
         // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
         var handler = operationHandlers?.TryGetValue(operationType, out var tempHandler) == true ? tempHandler : null;
@@ -163,7 +165,7 @@ public class SocketListener
             try
             {
                 // Call the handler with the received data and byte count.
-                handler(data, bytesRead);
+                handler(stream, data, bytesRead);
             }
             catch (Exception ex)
             {

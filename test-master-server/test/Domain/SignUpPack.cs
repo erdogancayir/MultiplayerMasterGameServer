@@ -8,9 +8,6 @@ public class SignUpRequest : BasePack
     public string Username { get; set; } = "defaultUser";
 
     [Key(2)]
-    public string Email { get; set; } = "user@example.com";
-
-    [Key(3)]
     public string Password { get; set; } = "defaultPassword";
 }
 
