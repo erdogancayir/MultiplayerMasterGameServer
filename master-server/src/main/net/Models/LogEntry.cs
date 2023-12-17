@@ -6,11 +6,11 @@ public class LogEntry
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string LogID { get; set; }
+    public string LogID { get; set; } = string.Empty;
 
     public DateTime Timestamp { get; set; }
-    public string Type { get; set; } // e.g., Error, Info, Warning
-    public string Message { get; set; }
-    public string PlayerID { get; set; } // Optional
-    public string ServerID { get; set; } // Optional
+    public string Type { get; set; } = string.Empty; // e.g., Error, Info, Warning
+    public string Message { get; set; } = string.Empty;
+    public string? PlayerID { get; set; }
+    public string? ServerID { get; set; }
 }

@@ -2,10 +2,11 @@ public enum OperationType
 {
     // Authentication Operations
     LoginRequest = 100,
+    LoginResponse = 101,
     LogoutRequest = 101,
-    AuthenticationResponse = 102,
-    SignUpRequest = 103,
-    SignUpResponse = 104,
+    AuthenticationResponse = 103,
+    SignUpRequest = 104,
+    SignUpResponse = 105,
     // Matchmaking Operations
     JoinLobbyRequest = 200,
     LeaveLobbyRequest = 201,

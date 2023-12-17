@@ -9,7 +9,7 @@ public class SocketListener
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
     private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
-
+    
     /// <summary>
     /// Initializes a new instance of the SocketListener class.
     /// </summary>
@@ -76,7 +76,9 @@ public class SocketListener
         try
         {
             TcpClient client = _listener.EndAcceptTcpClient(ar);
-            Task.Run(() => HandleNewConnection(client));
+            var clientConnection = new ClientConnectionHandler(client, operationHandlers);
+            Task.Run(() => clientConnection.HandleNewConnection());
+            //Task.Run(() => HandleNewConnection(client));
             BeginAcceptClient();
         }
         catch (Exception ex)
@@ -91,7 +93,7 @@ public class SocketListener
     /// <param name="client">The client that has connected to the server.</param>
     private async Task HandleNewConnection(TcpClient client)
     {
-        Console.WriteLine($"Client connected: {client.Client.RemoteEndPoint}");
+        Console.WriteLine($"Client dwdwdwdwdwd: {client.Client.RemoteEndPoint}");
         try
         {
             // Establishes a network stream with the connected client for data communication.
@@ -125,7 +127,6 @@ public class SocketListener
             Console.WriteLine("Received data is too short.");
             return;
         }
-
         try
         {
             // Deserialize the data into a BasePack object to extract the OperationType.

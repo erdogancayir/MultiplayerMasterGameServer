@@ -1,17 +1,22 @@
 using MongoDB.Driver;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 public class PlayerManager
 {
     private readonly IMongoCollection<Player> _players;
+    private readonly LogManager _logManager;
 
-    /// <summary>
+    // <summary>
     /// Initializes a new instance of the PlayerManager class.
     /// </summary>
     /// <param name="dbInterface">The database interface for accessing the players collection.</param>
-    public PlayerManager(DbInterface dbInterface)
+    /// <param name="logManager">The LogManager for logging activities.</param>
+    public PlayerManager(DbInterface dbInterface, LogManager logManager)
     {
         _players = dbInterface.GetCollection<Player>("Players");
+        _logManager = logManager;
     }
 
     /// <summary>
@@ -55,10 +60,12 @@ public class PlayerManager
         try
         {
             await _players.InsertOneAsync(player);
+            await _logManager.CreateLogAsync("Info", $"New player created: {username}", player.PlayerID);
             return true;
         }
         catch (Exception ex)
         {
+            await _logManager.CreateLogAsync("Error", $"Failed to create player: {ex.Message}");
             Console.WriteLine($"Failed to create player: {ex.Message}");
             return false;
         }
@@ -72,5 +79,36 @@ public class PlayerManager
     private string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
+    }
+
+    /// <summary>
+    /// Retrieves a player by their username.
+    /// </summary>
+    /// <param name="username">The username of the player.</param>
+    /// <returns>The player object if found; otherwise, null.</returns>
+    public async Task<Player> GetPlayerByUsernameAsync(string? username)
+    {
+        return await _players.Find(p => p.Username == username).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Validates the provided password against the stored password hash.
+    /// </summary>
+    /// <param name="storedHash">The stored password hash.</param>
+    /// <param name="password">The password to validate.</param>
+    /// <returns>True if the password is valid; otherwise, false.</returns>
+    public bool ValidatePassword(string? storedHash, string? password)
+    {
+        return BCrypt.Net.BCrypt.Verify(password, storedHash);
+    }
+
+    /// <summary>
+    /// Generates a simple token for authentication purposes.
+    /// </summary>
+    /// <returns>A newly generated token.</returns>
+    public string GenerateToken()
+    {
+        Guid token = Guid.NewGuid();
+        return token.ToString();
     }
 }

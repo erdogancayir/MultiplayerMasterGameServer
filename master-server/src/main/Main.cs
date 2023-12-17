@@ -59,10 +59,18 @@ namespace MasterServer
 
             // Register DbInterface with necessary parameters
             services.AddSingleton<DbInterface>(provider => new DbInterface(dbConnectionString, dbName));
-            
-            // Register other services like PlayerManager, AuthService, Matchmaker, etc.
-            services.AddSingleton<PlayerManager>();
-            services.AddSingleton<IAuthService, AuthService>();
+
+            // Register LogManager
+            services.AddSingleton<LogManager>();
+
+            // Register PlayerManager with LogManager dependency
+            services.AddSingleton<PlayerManager>(provider => 
+                new PlayerManager(provider.GetRequiredService<DbInterface>(), provider.GetRequiredService<LogManager>()));
+
+            // Register AuthService with LogManager dependency
+            services.AddSingleton<IAuthService, AuthService>(provider =>
+                new AuthService(provider.GetRequiredService<PlayerManager>(), provider.GetRequiredService<LogManager>()));
+
             services.AddSingleton<Matchmaker>();
             // ...other service registrations...
         }

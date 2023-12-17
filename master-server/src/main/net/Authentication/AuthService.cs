@@ -12,14 +12,17 @@ public interface IAuthService
 public class AuthService : IAuthService
 {
     private readonly PlayerManager _playerManager;
+    private readonly LogManager _logManager;
 
     /// <summary>
     /// Initializes a new instance of the AuthService class.
     /// </summary>
     /// <param name="playerManager">The PlayerManager instance for handling player-related operations.</param>
-    public AuthService(PlayerManager playerManager)
+    /// <param name="logManager">The LogManager for logging activities.</param>
+    public AuthService(PlayerManager playerManager, LogManager logManager)
     {
         _playerManager = playerManager;
+        _logManager = logManager;
     }
 
 
@@ -32,9 +35,12 @@ public class AuthService : IAuthService
     {
         try
         {
+            Console.WriteLine("Sign up request received.");
             // Deserialize the received data into a SignUpRequest object
             var signUpRequest = MessagePackSerializer.Deserialize<SignUpRequest>(data);
             var response = new SignUpResponse();
+            response.OperationTypeId = (int)OperationType.SignUpResponse;
+            Console.WriteLine($"Username: { response.OperationTypeId }");
             if (!await _playerManager.IsUsernameAvailable(signUpRequest.Username))
             {
                 response.Success = false;
@@ -67,21 +73,48 @@ public class AuthService : IAuthService
             Console.WriteLine($"Error processing sign up request: {ex.Message}");
         }
     }
-    public void HandleLoginRequest(NetworkStream clientStream, byte[] data, int bytesRead)
+
+    /// <summary>
+    /// Handles the login request by deserializing the data and authenticating the player.
+    /// </summary>
+    /// <param name="clientStream">The network stream to communicate with the client.</param>
+    /// <param name="data">The byte array containing the serialized login request data.</param>
+    /// <param name="bytesRead">The number of bytes read from the stream.</param>
+    public async void HandleLoginRequest(NetworkStream clientStream, byte[] data, int bytesRead)
     {
-        // Process login request
         try
         {
-            var authenticationRequest = MessagePackSerializer.Deserialize<AuthenticationRequest>(data);
+            Console.WriteLine("Login request received.");
+            // Deserialize the received data into an AuthenticationRequest object
+            var loginRequest = MessagePackSerializer.Deserialize<AuthenticationRequest>(data);
             var response = new AuthenticationResponse();
+            response.OperationTypeId = (int)OperationType.LoginResponse;
+            // Validate the username and password
+            var player = await _playerManager.GetPlayerByUsernameAsync(loginRequest.Username);
+            Console.WriteLine($"Username: { loginRequest.Username }");
+            if (player != null && _playerManager.ValidatePassword(player.PasswordHash, loginRequest.Password))
+            {
+                response.Success = true;
+                response.Token = _playerManager.GenerateToken();
+                Console.WriteLine($"Token: { response.Token }");
+                response.Message = "Login successful.";
+                Console.WriteLine(response.Message);
+            }
+            else
+            {
+                response.Success = false;
+                response.ErrorMessage = "Invalid username or password.";
+                Console.WriteLine(response.ErrorMessage);
+            }
 
-            
+            // Serialize the response object and send it back to the client
+            var responseData = MessagePackSerializer.Serialize(response);
+            await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error processing login request: {ex.Message}");
         }
-
     }
 
     public void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int bytesRead)

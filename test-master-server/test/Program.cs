@@ -5,7 +5,7 @@ using MessagePack;
 
 public class TcpClientExample
 {
-    public static async Task Main(string[] args)
+    private static async Task SendRequest(OperationType operationType)
     {
         string server = "127.0.0.1"; // Master Server IP
         int port = 8080; // Master Server Port
@@ -16,26 +16,65 @@ public class TcpClientExample
         {
             await client.ConnectAsync(server, port);
 
-            var signUpRequest = new SignUpRequest
+            byte[] dataToSend;
+            switch (operationType)
             {
-                OperationTypeId = (int)OperationType.SignUpRequest,
-                Username = "efwefewfewef324 rgreg",
-                Password = "strongPassword"
-            };
+                case OperationType.SignUpRequest:
+                    var signUpRequest = new SignUpRequest
+                    {
+                        OperationTypeId = (int)operationType,
+                        Username = "admin",
+                        Password = "password"
+                    };
+                    dataToSend = MessagePackSerializer.Serialize(signUpRequest);
+                    break;
 
-            byte[] dataToSend = MessagePackSerializer.Serialize(signUpRequest);
+                case OperationType.LoginRequest:
+                    var authenticationRequest = new AuthenticationRequest
+                    {
+                        OperationTypeId = (int)operationType,
+                        Username = "admin",
+                        Password = "password"
+                    };
+                    dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
+                    break;
+                default:
+                    throw new InvalidOperationException("Unsupported operation type.");
+            }
+
             NetworkStream stream = client.GetStream();
             await stream.WriteAsync(dataToSend, 0, dataToSend.Length);
-            Console.WriteLine("SignUpRequest sent to server.");
+            Console.WriteLine($"{operationType} sent to server.");
 
-            // Sunucudan yanıtı okuma
+            // Sunucudan yanıtı okuma ve işleme
             byte[] buffer = new byte[1024];
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             if (bytesRead > 0)
             {
-                // Yanıtı deserialize etme
-                var response = MessagePackSerializer.Deserialize<SignUpResponse>(buffer);
-                Console.WriteLine($"Response: Success = {response.Success}, Message = {response.Message}");
+                try
+                {
+                    // Deserialize the data into a BasePack object to extract the OperationType.
+                    var basePack = MessagePackSerializer.Deserialize<BasePack>(buffer);
+                    OperationType operationTypeResponse = (OperationType)basePack.OperationTypeId;
+                    Console.WriteLine($"OperationType: {operationTypeResponse}");
+        
+                    switch (operationTypeResponse)
+                    {
+                        case OperationType.SignUpResponse: // Corrected enum access
+                            var signUpResponse = MessagePackSerializer.Deserialize<SignUpResponse>(buffer);
+                            Console.WriteLine($"SignUp Response: Success = {signUpResponse.Success}, Message = {signUpResponse.Message}");
+                            break;
+
+                        case OperationType.LoginResponse:
+                            var authenticationResponse = MessagePackSerializer.Deserialize<AuthenticationResponse>(buffer);
+                            Console.WriteLine($"Login Response: Token = {authenticationResponse.Token}, ErrorMessage = {authenticationResponse.ErrorMessage}");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deserializing operation type: {ex.Message}");
+                }
             }
         }
         catch (Exception ex)
@@ -46,5 +85,12 @@ public class TcpClientExample
         {
             client.Close();
         }
+    }
+
+    public static async Task Main(string[] args)
+    {
+        await SendRequest(OperationType.SignUpRequest);
+        await SendRequest(OperationType.LoginRequest);
+        //await SendRequest(OperationType.LogoutRequest);
     }
 }
