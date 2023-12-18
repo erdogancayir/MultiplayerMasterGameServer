@@ -82,7 +82,7 @@ src
 │   │   │   ├── MatchmakingManager.cs
 │   │   │   ├── SessionManager.cs
 │   │   │   └── PlayerManager.cs
-|   |   ├── Database
+|   |   ├── Domain
 │   │   │   ├── AuthenticationPack.cs
 │   │   │   ├── BasePack.cs
 │   │   │   ├── GameServerAllocationPack.cs

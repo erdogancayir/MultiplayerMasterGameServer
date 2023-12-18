@@ -46,6 +46,7 @@ public class SocketListener
             { OperationType.LogoutRequest, authService.HandleLogoutRequest },
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
+            { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
             // ... other mappings ...
         };
     }
@@ -91,7 +92,7 @@ public class SocketListener
             
             _connectionManager.AddConnection(connectionId, client);
 
-            Task.Run(() => clientConnection.HandleNewConnection(connectionId));
+            Task.Run(() => clientConnection.HandleNewConnection());
             //Task.Run(() => HandleNewConnection(client));
             BeginAcceptClient();
         }

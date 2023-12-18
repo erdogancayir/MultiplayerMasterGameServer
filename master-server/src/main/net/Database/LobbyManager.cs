@@ -14,7 +14,7 @@ public class LobbyManager
         await _lobbies.InsertOneAsync(lobby);
     }
 
-    public async Task UpdateLobby(string lobbyID, string newStatus)
+    public async Task UpdateLobby(string lobbyID, string? newStatus)
     {
         var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyID);
         var update = Builders<Lobby>.Update.Set(l => l.Status, newStatus);
@@ -30,6 +30,12 @@ public class LobbyManager
     {
         await _lobbies.DeleteOneAsync(l => l.LobbyID == lobbyID);
     }
+
+    public async Task<List<Lobby>> GetLobbies()
+    {
+        return await _lobbies.Find(l => true).ToListAsync();
+    }
+
 
     // ... Additional methods ...
 }

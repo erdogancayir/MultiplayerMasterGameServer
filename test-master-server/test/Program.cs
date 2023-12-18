@@ -23,8 +23,8 @@ public class TcpClientExample
                     var signUpRequest = new SignUpRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "3232gg",
-                        Password = "password"
+                        Username = "canodis",
+                        Password = "bulugu"
                     };
                     dataToSend = MessagePackSerializer.Serialize(signUpRequest);
                     break;
@@ -33,8 +33,8 @@ public class TcpClientExample
                     var authenticationRequest = new AuthenticationRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "3232gg",
-                        Password = "password"
+                        Username = "canodis",
+                        Password = "bulugu"
                     };
                     dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
                     break;
@@ -42,7 +42,7 @@ public class TcpClientExample
                     var logoutRequest = new LogoutRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "3232gg"
+                        Username = "canodis"
                     };
                     dataToSend = MessagePackSerializer.Serialize(logoutRequest);
                     break;
@@ -117,7 +117,7 @@ public class TcpClientExample
     {
         //await SendRequest(OperationType.SignUpRequest);
         //await SendRequest(OperationType.LoginRequest);
-        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTdmNDM1Y2IzMGYyNmQzYzA4NjdhNTEiLCJuYmYiOjE3MDI5MDE3MTQsImV4cCI6MTcwMzUwNjUxNCwiaWF0IjoxNzAyOTAxNzE0fQ.XvkgEn7VY81T0Z3EjS-lNfS1ZJjAyDorfLKdH-36wFA");
+        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgwOGQxMDJjNTQ1ZmUzMGE0YmM5MjUiLCJuYmYiOjE3MDI5MzE2MjUsImV4cCI6MTcwMzUzNjQyNSwiaWF0IjoxNzAyOTMxNjI1fQ.wxwLFxsEdxTgx--ukKQteSAXoA5jH6JT-1JTYssO34Q");
         //await SendRequest(OperationType.LogoutRequest);
     }
 }

@@ -1,14 +1,17 @@
 using MessagePack;
 
 [MessagePackObject]
-public class MatchmakingRequest : BasePack
+public class CreateLobbyRequest : BasePack
 {
     [Key(1)]
     public string Token { get; set; } = string.Empty;
+
+    [Key(2)]
+    public int MaxPlayers { get; set; }
 }
 
 [MessagePackObject]
-public class MatchmakingResponse : BasePack
+public class CreateLobbyResponse : BasePack
 {
     [Key(1)]
     public string? LobbyID { get; set; }
@@ -24,4 +27,5 @@ public class MatchmakingResponse : BasePack
 
     [Key(5)]
     public string? ErrorMessage { get; set; }
+
 }

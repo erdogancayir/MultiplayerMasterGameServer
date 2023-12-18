@@ -14,7 +14,7 @@ public class AuthenticationRequest : BasePack
 public class AuthenticationResponse : BasePack
 {
     [Key(1)]
-    public bool Success { get; set; } = false; // Varsayılan başarı durumu.
+    public bool Success { get; set; } = false;
 
     [Key(2)]
     public string? Token { get; set; } // Session token if authentication is successful.

@@ -7,7 +7,7 @@ public interface IAuthService
     void HandleLoginRequest(NetworkStream clientStream, byte[] data, string connectionId);
     void HandleLogoutRequest(NetworkStream clientStream,byte[] data, string connectionId);
     void HandleSignUpRequest(NetworkStream clientStream, byte[] data, string connectionId);
-    // Diğer metodlar...
+
 }
 
 public class AuthService : IAuthService
@@ -47,8 +47,6 @@ public class AuthService : IAuthService
             {
                 response.Success = false;
                 response.Message = "Username already taken";
-                var playerId = await _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
-                _connectionManager.UpdateConnectionId(connectionId, playerId);
                 Console.WriteLine(response.Message);
             }
             else
@@ -58,6 +56,8 @@ public class AuthService : IAuthService
                 {
                     response.Success = true;
                     response.Message = "Player successfully created.";
+                    var playerId = await _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
+                    _connectionManager.UpdateConnectionId(connectionId, playerId);
                     Console.WriteLine(response.Message);
                 }
                 else

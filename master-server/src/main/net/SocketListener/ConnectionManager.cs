@@ -9,16 +9,16 @@ public class ConnectionManager
         _connections[playerId] = client;
     }
 
-    public TcpClient GetConnection(string playerId)
+    public TcpClient? GetConnection(string playerId)
     {
-        Console.WriteLine("opssss");
-        _connections.TryGetValue(playerId, out TcpClient client);
+        //Console.WriteLine("opssss");
+        _connections.TryGetValue(playerId, out TcpClient? client);
         return client;
     }
 
     public void UpdateConnectionId(string oldConnectionId, string newPlayerId)
     {
-        if (_connections.TryGetValue(oldConnectionId, out TcpClient client))
+        if (_connections.TryGetValue(oldConnectionId, out TcpClient? client))
         {
             _connections.Remove(oldConnectionId);
             _connections[newPlayerId] = client;

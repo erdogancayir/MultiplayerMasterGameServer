@@ -129,4 +129,9 @@ public class PlayerManager
         var filter = Builders<Player>.Filter.In(p => p.PlayerID, playerIds);
         return await _players.Find(filter).ToListAsync();
     }
+
+    public async Task<Player> GetPlayer(string playerID)
+    {
+        return await _players.Find(p => p.PlayerID == playerID).FirstOrDefaultAsync();
+    }
 }
