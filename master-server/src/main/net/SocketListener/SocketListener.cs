@@ -9,7 +9,7 @@ public class SocketListener
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
     private readonly ConnectionManager _connectionManager;
-    private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
+    private Dictionary<OperationType, Action<NetworkStream ,byte[], string>>? operationHandlers;
     
     /// <summary>
     /// Initializes a new instance of the SocketListener class.
@@ -40,7 +40,7 @@ public class SocketListener
                      ?? throw new InvalidOperationException("Matchmaker not available.");
 
         // Mapping each operation type to its corresponding handler.
-        operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
+        operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], string>>
         {
             { OperationType.LoginRequest, authService.HandleLoginRequest },
             { OperationType.LogoutRequest, authService.HandleLogoutRequest },
@@ -91,7 +91,7 @@ public class SocketListener
             
             _connectionManager.AddConnection(connectionId, client);
 
-            Task.Run(() => clientConnection.HandleNewConnection());
+            Task.Run(() => clientConnection.HandleNewConnection(connectionId));
             //Task.Run(() => HandleNewConnection(client));
             BeginAcceptClient();
         }

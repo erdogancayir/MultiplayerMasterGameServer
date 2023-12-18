@@ -11,6 +11,7 @@ public class ConnectionManager
 
     public TcpClient GetConnection(string playerId)
     {
+        Console.WriteLine("opssss");
         _connections.TryGetValue(playerId, out TcpClient client);
         return client;
     }

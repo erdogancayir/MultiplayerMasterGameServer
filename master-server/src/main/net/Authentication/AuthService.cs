@@ -4,9 +4,9 @@ using MessagePack;
 
 public interface IAuthService
 {
-    void HandleLoginRequest(NetworkStream clientStream, byte[] data, int bytesRead);
-    void HandleLogoutRequest(NetworkStream clientStream,byte[] data, int bytesRead);
-    void HandleSignUpRequest(NetworkStream clientStream, byte[] data, int bytesRead);
+    void HandleLoginRequest(NetworkStream clientStream, byte[] data, string connectionId);
+    void HandleLogoutRequest(NetworkStream clientStream,byte[] data, string connectionId);
+    void HandleSignUpRequest(NetworkStream clientStream, byte[] data, string connectionId);
     // Diğer metodlar...
 }
 
@@ -34,7 +34,7 @@ public class AuthService : IAuthService
     /// </summary>
     /// <param name="data">The byte array containing the serialized sign-up request data.</param>
     /// <param name="bytesRead">The number of bytes read from the stream.</param>
-    public async void HandleSignUpRequest(NetworkStream clientStream, byte[] data, int bytesRead)
+    public async void HandleSignUpRequest(NetworkStream clientStream, byte[] data, string connectionId)
     {
         try
         {
@@ -47,8 +47,8 @@ public class AuthService : IAuthService
             {
                 response.Success = false;
                 response.Message = "Username already taken";
-                var playerId = _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
-                _connectionManager.UpdateConnectionId(playerId);
+                var playerId = await _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
+                _connectionManager.UpdateConnectionId(connectionId, playerId);
                 Console.WriteLine(response.Message);
             }
             else
@@ -84,7 +84,7 @@ public class AuthService : IAuthService
     /// <param name="clientStream">The network stream to communicate with the client.</param>
     /// <param name="data">The byte array containing the serialized login request data.</param>
     /// <param name="bytesRead">The number of bytes read from the stream.</param>
-    public async void HandleLoginRequest(NetworkStream clientStream, byte[] data, int bytesRead)
+    public async void HandleLoginRequest(NetworkStream clientStream, byte[] data, string connectionId)
     {
         try
         {
@@ -120,7 +120,7 @@ public class AuthService : IAuthService
         }
     }
 
-    public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int bytesRead)
+    public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, string connectionId)
     {
         try
         {

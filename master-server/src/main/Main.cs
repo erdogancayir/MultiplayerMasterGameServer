@@ -96,9 +96,9 @@ namespace MasterServer
             services.AddSingleton<Matchmaker>(provider =>
                 new Matchmaker(provider.GetRequiredService<LobbyManager>(),
                     provider.GetRequiredService<TokenManager>(),
-                    provider.GetRequiredService<PlayerManager>()
+                    provider.GetRequiredService<PlayerManager>(),
+                    provider.GetRequiredService<ConnectionManager>()
                 ));
-
             // ...other service registrations...
         }
 

@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MessagePack;
 using MongoDB.Driver;
@@ -12,15 +13,17 @@ public class Matchmaker
     private readonly int requiredPlayersForMatch = 2; // Or any number based on your game's rules
     private readonly TokenManager _tokenManager;
     private PlayerManager playerManager;
+    private readonly ConnectionManager _connectionManager;
 
-    public Matchmaker(LobbyManager lobbyManager, TokenManager tokenManager, PlayerManager playerManager)
+    public Matchmaker(LobbyManager lobbyManager, TokenManager tokenManager, PlayerManager playerManager, ConnectionManager connectionManager)
     {
         this.lobbyManager = lobbyManager;
         _tokenManager = tokenManager;
         this.playerManager = playerManager;
+        _connectionManager = connectionManager;
     }
 
-    public async void HandleJoinLobbyRequest(NetworkStream stream, byte[] data, int length)
+    public async void HandleJoinLobbyRequest(NetworkStream stream, byte[] data, string connectionId)
     {
         try
         {
@@ -30,16 +33,21 @@ public class Matchmaker
             joinLobbyResponse.OperationTypeId = (int)OperationType.JoinLobbyResponse;
 
             // Token doğrulaması
+            Console.WriteLine($"Token gelen {joinLobbyRequest.Token}");
             var playerId = _tokenManager.ValidateToken(joinLobbyRequest.Token);
+            Console.WriteLine($"player id {playerId}");
             if (playerId == null)
             {
-                // Hata: Token geçersiz
+                // invalid token
+                Console.WriteLine($"invalid token:  {playerId}");
                 var response = new MatchmakingResponse { OperationTypeId = (int)OperationType.JoinLobbyResponse, Success = false };
                 await SendMessage(stream, response);
                 return;
             }
-
+            Console.WriteLine("tokes is ok");
+            joinLobbyResponse.Success = true;
             await AddPlayerToQueue(playerId);
+            PrintQueueContents();
             await SendMessage(stream, joinLobbyResponse);
         }
         catch (Exception ex)
@@ -51,7 +59,7 @@ public class Matchmaker
     public async Task AddPlayerToQueue(string playerId)
     {
         matchmakingQueue.Enqueue(playerId);
-        await TryCreateMatch(); // Asenkron çağrı
+        await TryCreateMatch();
     }
 
 
@@ -95,36 +103,49 @@ public class Matchmaker
         {
             // Oyuncuya lobi ataması hakkında bilgi gönder
             var matchmakingResponse = new MatchmakingResponse
-                {
-                    OperationTypeId = (int)OperationType.MatchmakingResponse,
-                    Success = true,
-                    LobbyID = lobby.LobbyID,
-                    PlayerIDs = lobby.Players,
-                    Status = lobby.Status
-                };
-
-            // Oyuncunun ağ stream'ini bul (örneğin, oyuncunun sunucu ile olan bağlantısı)
-            NetworkStream playerStream = GetPlayerStream(player.PlayerID ?? string.Empty);
-
-            if (playerStream != null)
             {
-                var responseData = MessagePackSerializer.Serialize(matchmakingResponse);
-                await playerStream.WriteAsync(responseData, 0, responseData.Length);
+                OperationTypeId = (int)OperationType.MatchmakingResponse,
+                Success = true,
+                LobbyID = lobby.LobbyID,
+                PlayerIDs = lobby.Players,
+                Status = lobby.Status
+            };
+
+            try
+            {
+                NetworkStream playerStream = GetPlayerStream(player.PlayerID ?? string.Empty);
+                if (playerStream != null)
+                {
+                    var responseData = MessagePackSerializer.Serialize(matchmakingResponse);
+                    await playerStream.WriteAsync(responseData, 0, responseData.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending lobby assignment to player {player.PlayerID}: {ex.Message}");
             }
         }
     }
 
     private NetworkStream GetPlayerStream(string playerId)
     {
-        // Oyuncunun sunucu ile olan ağ bağlantısını döndürür
-        // Bu, uygulamanızın nasıl tasarlandığına bağlıdır
-        // Örnek: return playerConnections[playerId].Stream;
+        TcpClient client = _connectionManager.GetConnection(playerId);
+        return client.GetStream();
     }
 
     private async Task SendMessage(NetworkStream stream, BasePack response)
     {
         var responseData = MessagePackSerializer.Serialize(response);
         await stream.WriteAsync(responseData, 0, responseData.Length);
+    }
+
+    public void PrintQueueContents()
+    {
+        Console.WriteLine("Current contents of the matchmaking queue:");
+        foreach (var item in matchmakingQueue)
+        {
+            Console.WriteLine(item);
+        }
     }
 
 }

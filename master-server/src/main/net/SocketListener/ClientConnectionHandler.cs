@@ -5,11 +5,11 @@ public class ClientConnectionHandler
 {
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
-    private readonly Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
+    private readonly Dictionary<OperationType, Action<NetworkStream, byte[], string>>? _operationHandlers;
     private ConnectionManager _connectionManager;
     private string _connectionId;
 
-    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers, ConnectionManager connectionManager, string connectionId)    {
+    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], string>>? operationHandlers, ConnectionManager connectionManager, string connectionId)    {
         _client = client;
         //using var networkStream = client.GetStream();
         _stream = client.GetStream();
@@ -32,7 +32,7 @@ public class ClientConnectionHandler
     /// Handles a new client connection.
     /// </summary>
     /// <param name="client">The client that has connected to the server.</param>
-    public async Task HandleNewConnection()
+    public async Task HandleNewConnection(string connectionId)
     {
         Console.WriteLine($"Client connected: {_client.Client.RemoteEndPoint}");
         try
@@ -40,7 +40,7 @@ public class ClientConnectionHandler
             byte[] buffer = new byte[1024];
             int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
             // Processes the received data.
-            HandleReceivedData(buffer, bytesRead); // This is now synchronous
+            HandleReceivedData(buffer, bytesRead, connectionId); // This is now synchronous
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public class ClientConnectionHandler
     /// </summary>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes actually read from the network stream.</param>
-    private void HandleReceivedData(byte[] data, int bytesRead)
+    private void HandleReceivedData(byte[] data, int bytesRead, string connectionId)
     {
         // Check if the received data is less than the size of an integer.
         if (bytesRead < sizeof(int))
@@ -81,7 +81,7 @@ public class ClientConnectionHandler
             }
 
             // Call the appropriate handler based on the OperationType.
-            InvokeHandlerForOperationType(operationType, data, bytesRead);
+            InvokeHandlerForOperationType(operationType, data, bytesRead, connectionId);
         }
         catch (Exception ex)
         {
@@ -95,7 +95,7 @@ public class ClientConnectionHandler
     /// <param name="operationType">The operation type to handle.</param>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes read from the network stream.</param>
-    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, int bytesRead)
+    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, int bytesRead, string connectionId)
     {
         // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
         var handler = _operationHandlers?.TryGetValue(operationType, out var tempHandler) == true ? tempHandler : null;
@@ -105,7 +105,7 @@ public class ClientConnectionHandler
             try
             {
                 // Call the handler with the received data and byte count.
-                handler(_stream, data, bytesRead);
+                handler(_stream, data, connectionId);
             }
             catch (Exception ex)
             {

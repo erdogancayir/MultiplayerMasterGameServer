@@ -5,7 +5,7 @@ using MessagePack;
 
 public class TcpClientExample
 {
-    private static async Task SendRequest(OperationType operationType)
+    private static async Task SendRequest(OperationType operationType, string token = "")
     {
         string server = "127.0.0.1"; // Master Server IP
         int port = 8080; // Master Server Port
@@ -46,6 +46,14 @@ public class TcpClientExample
                     };
                     dataToSend = MessagePackSerializer.Serialize(logoutRequest);
                     break;
+                case OperationType.JoinLobbyRequest:
+                    var joinLobbyRequest = new MatchmakingRequest
+                    {
+                        OperationTypeId = (int)operationType,
+                        Token = token
+                    };
+                    dataToSend = MessagePackSerializer.Serialize(joinLobbyRequest);
+                    break;
                 default:
                     throw new InvalidOperationException("Unsupported operation type.");
             }
@@ -56,6 +64,7 @@ public class TcpClientExample
 
             // Sunucudan yanıtı okuma ve işleme
             byte[] buffer = new byte[1024];
+            string? _token = null;
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             if (bytesRead > 0)
             {
@@ -75,11 +84,16 @@ public class TcpClientExample
 
                         case OperationType.LoginResponse:
                             var authenticationResponse = MessagePackSerializer.Deserialize<AuthenticationResponse>(buffer);
+                            _token = authenticationResponse.Token;
                             Console.WriteLine($"Login Response: Token = {authenticationResponse.Token}, ErrorMessage = {authenticationResponse.ErrorMessage}");
                             break;
                         case OperationType.LogoutResponse:
                             var logoutResponse = MessagePackSerializer.Deserialize<LogoutResponse>(buffer);
                             Console.WriteLine($"Logout Response: Success = {logoutResponse.Success}, ErrorMessage = {logoutResponse.ErrorMessage}");
+                            break;
+                        case OperationType.JoinLobbyResponse:
+                            var res1 = MessagePackSerializer.Deserialize<MatchmakingResponse>(buffer);
+                            Console.WriteLine($"MatchmakingResponse: Success = {res1.Success}, ErrorMessage = {res1.ErrorMessage}");
                             break;
                     }
                 }
@@ -101,8 +115,9 @@ public class TcpClientExample
 
     public static async Task Main(string[] args)
     {
-        await SendRequest(OperationType.SignUpRequest);
-        await SendRequest(OperationType.LoginRequest);
-        await SendRequest(OperationType.LogoutRequest);
+        //await SendRequest(OperationType.SignUpRequest);
+        //await SendRequest(OperationType.LoginRequest);
+        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTdmNDM1Y2IzMGYyNmQzYzA4NjdhNTEiLCJuYmYiOjE3MDI5MDE3MTQsImV4cCI6MTcwMzUwNjUxNCwiaWF0IjoxNzAyOTAxNzE0fQ.XvkgEn7VY81T0Z3EjS-lNfS1ZJjAyDorfLKdH-36wFA");
+        //await SendRequest(OperationType.LogoutRequest);
     }
 }

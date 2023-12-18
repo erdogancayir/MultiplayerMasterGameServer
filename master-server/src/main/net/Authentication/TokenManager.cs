@@ -8,6 +8,7 @@ public interface ITokenStorage
     void StoreToken(string playerId, string token);
     bool IsTokenValid(string token);
     void RemoveToken(string playerId);
+    string? GetPlayerIdForToken(string token);
     // Diğer metodlar...
 }
 
@@ -60,7 +61,7 @@ public class TokenManager
     /// </summary>
     /// <param name="token">The token to validate.</param>
     /// <returns>The player ID if valid; otherwise, null.</returns>
-    public string ValidateToken(string token)
+    public string? ValidateToken(string token)
     {
         try
         {
@@ -76,11 +77,7 @@ public class TokenManager
             };
             tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-
-            var jwtToken = validatedToken as JwtSecurityToken;
-            var playerIdClaim = jwtToken?.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            return _tokenStorage.IsTokenValid(token) ? playerIdClaim : null;
+            return _tokenStorage.GetPlayerIdForToken(token);
         }
         catch
         {

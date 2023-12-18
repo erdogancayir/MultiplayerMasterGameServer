@@ -4,7 +4,7 @@ using MessagePack;
 public class MatchmakingRequest : BasePack
 {
     [Key(1)]
-    public string PlayerID { get; set; }
+    public string Token { get; set; }
 
     [Key(2)]
     public string LobbyID { get; set; }
@@ -18,4 +18,14 @@ public class MatchmakingResponse : BasePack
 
     [Key(2)]
     public List<string> PlayerIDs { get; set; }
+
+    [Key(3)]
+    public string Status { get; set; } // "Waiting", "Full"
+
+    [Key(4)]
+    public bool Success { get; set; }
+
+    [Key(5)]
+    public string? ErrorMessage { get; set; }
+
 }
