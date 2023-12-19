@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Desktop/gameserver/test-master-server/test/test.csproj": {}
+    "/home/erdogancayir/Desktop/sonhal/test-master-server/test/test.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Desktop/gameserver/test-master-server/test/test.csproj": {
+    "/home/erdogancayir/Desktop/sonhal/test-master-server/test/test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/test-master-server/test/test.csproj",
+        "projectUniqueName": "/home/erdogancayir/Desktop/sonhal/test-master-server/test/test.csproj",
         "projectName": "test",
-        "projectPath": "/home/erdogancayir/Desktop/gameserver/test-master-server/test/test.csproj",
+        "projectPath": "/home/erdogancayir/Desktop/sonhal/test-master-server/test/test.csproj",
         "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Desktop/gameserver/test-master-server/test/obj/",
+        "outputPath": "/home/erdogancayir/Desktop/sonhal/test-master-server/test/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

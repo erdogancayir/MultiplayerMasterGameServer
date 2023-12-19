@@ -47,6 +47,7 @@ public class Matchmaker
 
             var allLobbies = await lobbyManager.GetLobbies();
             var lobby = FindOrCreateLobby(allLobbies, playerId);
+            await lobbyManager.UpdateLobbyPlayers(lobby.LobbyID ?? string.Empty, lobby.Players ?? new List<string>());
             await UpdateLobbyStatus(lobby);
             await SendJoinLobbyResponse(stream, lobby);
         }
@@ -160,7 +161,6 @@ public class Matchmaker
                 players.Add(player);
             }
         }
-
         return players;
     }
 
@@ -174,7 +174,9 @@ public class Matchmaker
             PlayerIDs = lobby.Players,
             Status = lobby.Status
         };
-        await SendMessage(stream, response);
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
     }
 
     private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby)
@@ -187,7 +189,9 @@ public class Matchmaker
             PlayerIDs = lobby.Players,
             Status = lobby.Status
         };
-        await SendMessage(stream, response);
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
     }
 
     private async Task SendErrorResponse(NetworkStream stream, string message)
@@ -198,7 +202,9 @@ public class Matchmaker
             Success = false,
             ErrorMessage = message
         };
-        await SendMessage(stream, response);
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
     }
 
     /// <summary>

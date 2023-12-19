@@ -1501,11 +1501,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/master-server/master-server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Desktop/sonhal/master-server/master-server.csproj",
       "projectName": "master-server",
-      "projectPath": "/home/erdogancayir/Desktop/gameserver/master-server/master-server.csproj",
+      "projectPath": "/home/erdogancayir/Desktop/sonhal/master-server/master-server.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Desktop/gameserver/master-server/obj/",
+      "outputPath": "/home/erdogancayir/Desktop/sonhal/master-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

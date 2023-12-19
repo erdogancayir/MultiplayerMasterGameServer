@@ -36,6 +36,12 @@ public class LobbyManager
         return await _lobbies.Find(l => true).ToListAsync();
     }
 
+    public async Task UpdateLobbyPlayers(string lobbyID, List<string> players)
+    {
+        var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyID);
+        var update = Builders<Lobby>.Update.Set(l => l.Players, players);
+        await _lobbies.UpdateOneAsync(filter, update);
+    }
 
     // ... Additional methods ...
 }
