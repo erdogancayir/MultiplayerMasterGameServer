@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "NNptrHQTSPmaigzZHPrXWjdUc5yzmAEdOspp1IaKN67ExVtMY9otZRqP56AsaRnX2/f8IQTXZW5fv3lw4ydF2Q==",
+  "dgSpecHash": "7mcXs8g7R/kOLP0zZgV6/3e/8MqJQd5tAUORrQ17NWDySLRfyZX62VpAusF0h0cB6iJ0wxmg4Ws9BslkpeFnwg==",
   "success": true,
-  "projectFilePath": "/home/erdogancayir/Desktop/gameserver/game-server/game-server.csproj",
+  "projectFilePath": "/home/erdogancayir/Desktop/game/game-server/game-server.csproj",
   "expectedPackageFiles": [
     "/home/erdogancayir/.nuget/packages/awssdk.core/3.7.100.14/awssdk.core.3.7.100.14.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/awssdk.securitytoken/3.7.100.14/awssdk.securitytoken.3.7.100.14.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/dnsclient/1.6.1/dnsclient.1.6.1.nupkg.sha512",
+    "/home/erdogancayir/.nuget/packages/dotenv.net/3.1.3/dotenv.net.3.1.3.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/microsoft.extensions.logging.abstractions/2.0.0/microsoft.extensions.logging.abstractions.2.0.0.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/microsoft.netcore.platforms/5.0.0/microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/microsoft.win32.registry/5.0.0/microsoft.win32.registry.5.0.0.nupkg.sha512",

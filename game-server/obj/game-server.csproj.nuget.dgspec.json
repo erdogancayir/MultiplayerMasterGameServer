@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Desktop/gameserver/game-server/game-server.csproj": {}
+    "/home/erdogancayir/Desktop/game/game-server/game-server.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Desktop/gameserver/game-server/game-server.csproj": {
+    "/home/erdogancayir/Desktop/game/game-server/game-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Desktop/gameserver/game-server/game-server.csproj",
+        "projectUniqueName": "/home/erdogancayir/Desktop/game/game-server/game-server.csproj",
         "projectName": "game-server",
-        "projectPath": "/home/erdogancayir/Desktop/gameserver/game-server/game-server.csproj",
+        "projectPath": "/home/erdogancayir/Desktop/game/game-server/game-server.csproj",
         "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Desktop/gameserver/game-server/obj/",
+        "outputPath": "/home/erdogancayir/Desktop/game/game-server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
@@ -41,6 +41,10 @@
             "MongoDB.Driver": {
               "target": "Package",
               "version": "[2.23.1, )"
+            },
+            "dotenv.net": {
+              "target": "Package",
+              "version": "[3.1.3, )"
             }
           },
           "imports": [
@@ -59,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/erdogancayir/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
