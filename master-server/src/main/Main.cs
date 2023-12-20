@@ -21,16 +21,13 @@ namespace MasterServer
                 // Build the service provider
                 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-                // Retrieve server configuration
                 var serverConfig = serviceProvider.GetService<ServerConfig>();
                 if (serverConfig == null)
                 {
                     throw new InvalidOperationException("Server configuration could not be loaded.");
                 }
-
                 // Initialize and start the socket listener
                 var socketListener = new SocketListener(serverConfig.SocketListenerPort, serviceProvider);
-                Console.WriteLine($"Listening for connections on port {serverConfig.SocketListenerPort}...");
                 socketListener.Start();
 
                 // Keep the server running
@@ -42,6 +39,7 @@ namespace MasterServer
             }
         }
 
+        #region Dependencies Setup
         /// <summary>
         /// Configures services for dependency injection.
         /// </summary>
@@ -52,26 +50,18 @@ namespace MasterServer
             var configLoader = new LoadServerConfiguration();
             services.AddSingleton(configLoader.DbConfig);
             services.AddSingleton(configLoader.ServerConfig);
-
             // Assuming DbConfig has properties for the connection string and database name
             var dbConnectionString = configLoader.DbConfig.ConnectionString;
             var dbName = configLoader.DbConfig.DatabaseName;
-
             // Register DbInterface with necessary parameters
             services.AddSingleton<DbInterface>(provider => new DbInterface(dbConnectionString, dbName));
-
             // Register LogManager
             services.AddSingleton<LogManager>();
-
-             // Register the implementation of ITokenStorage
-            services.AddSingleton<ITokenStorage, InMemoryTokenStorage>();
-
+            // Register the implementation of ITokenStorage
             var randomKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
-
             // Register TokenManager with its dependencies
             services.AddSingleton<TokenManager>(provider => 
-                new TokenManager(provider.GetRequiredService<ITokenStorage>(), randomKey));
-
+                new TokenManager(configLoader.ServerConfig.JwtSecretKey ?? randomKey));
             // Register PlayerManager with LogManager, TokenManager, and DbInterface dependencies
             services.AddSingleton<PlayerManager>(provider => 
                 new PlayerManager(
@@ -79,29 +69,30 @@ namespace MasterServer
                     provider.GetRequiredService<LogManager>(),
                     provider.GetRequiredService<TokenManager>()
                 ));
-
+            // Register ConnectionManager
             services.AddSingleton<ConnectionManager>();
-
-            // Register AuthService with LogManager dependency
-            services.AddSingleton<IAuthService, AuthService>(provider =>
+            // Register AuthService with LogManager,... dependency
+            services.AddSingleton<AuthService>(provider =>
                 new AuthService(provider.GetRequiredService<PlayerManager>(), provider.GetRequiredService<LogManager>(),
                     provider.GetRequiredService<ConnectionManager>()));
-
             // Register LobbyManager with DbInterface dependency
             services.AddSingleton<LobbyManager>(provider =>
                 new LobbyManager(provider.GetRequiredService<DbInterface>()));
-
-
-            // Register Matchmaker with LobbyManager dependency
+            // Register Matchmaker with LobbyManager,... dependency
             services.AddSingleton<Matchmaker>(provider =>
                 new Matchmaker(provider.GetRequiredService<LobbyManager>(),
                     provider.GetRequiredService<TokenManager>(),
                     provider.GetRequiredService<PlayerManager>(),
                     provider.GetRequiredService<ConnectionManager>()
                 ));
-            // ...other service registrations...
+            services.AddSingleton<GameManager>(provider =>
+                new GameManager(provider.GetRequiredService<DbInterface>()));
+            services.AddSingleton<GameStatisticsManager>(provider => 
+                new GameStatisticsManager(provider.GetRequiredService<DbInterface>()));
+            services.AddSingleton<LeaderboardManager>(provider =>
+                new LeaderboardManager(provider.GetRequiredService<DbInterface>()));
         }
-
+        #endregion
 
         /// <summary>
         /// Keeps the server running, handling logic for a graceful shutdown.

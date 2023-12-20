@@ -2,15 +2,7 @@ using System.Net.Sockets;
 using Amazon.Runtime.Internal.Util;
 using MessagePack;
 
-public interface IAuthService
-{
-    void HandleLoginRequest(NetworkStream clientStream, byte[] data, string connectionId);
-    void HandleLogoutRequest(NetworkStream clientStream,byte[] data, string connectionId);
-    void HandleSignUpRequest(NetworkStream clientStream, byte[] data, string connectionId);
-
-}
-
-public class AuthService : IAuthService
+public class AuthService
 {
     private readonly PlayerManager _playerManager;
     private readonly LogManager _logManager;
@@ -43,6 +35,7 @@ public class AuthService : IAuthService
             var signUpRequest = MessagePackSerializer.Deserialize<SignUpRequest>(data);
             var response = new SignUpResponse();
             response.OperationTypeId = (int)OperationType.SignUpResponse;
+            // Check if the username is available
             if (!await _playerManager.IsUsernameAvailable(signUpRequest.Username))
             {
                 response.Success = false;
@@ -57,6 +50,7 @@ public class AuthService : IAuthService
                     response.Success = true;
                     response.Message = "Player successfully created.";
                     var playerId = await _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
+                    // Update the connection ID with the real id in the connection manager
                     _connectionManager.UpdateConnectionId(connectionId, playerId);
                     Console.WriteLine(response.Message);
                 }
@@ -100,6 +94,9 @@ public class AuthService : IAuthService
                 response.Success = true;
                 response.Token = _playerManager.GenerateToken(player);
                 response.Message = "Login successful.";
+                var playerId = await _playerManager.GetPlayerIdByUsername(loginRequest.Username);
+                // Update the connection ID with the real id in the connection manager
+                _connectionManager.UpdateConnectionId(connectionId, playerId);
                 Console.WriteLine(response.Message);
                 await _logManager.CreateLogAsync("Info", $"Player logged in: {loginRequest.Username}", player.PlayerID);
             }
@@ -129,25 +126,24 @@ public class AuthService : IAuthService
             var logoutRequest = MessagePackSerializer.Deserialize<LogoutRequest>(data);
             var response = new LogoutResponse();
             response.OperationTypeId = (int)OperationType.LogoutResponse;
-            // Assuming you have a method in PlayerManager to get the player's ID by username
-            var player = await _playerManager.GetPlayerByUsernameAsync(logoutRequest.Username);
-            if (player != null)
+            // Validate the token
+            var playerId = await _playerManager.PlayerValidateToken(logoutRequest.Token ?? "");
+            if (!string.IsNullOrEmpty(playerId))
             {
-                // Invalidate the token
-                _playerManager.InvalidateToken(player.PlayerID ?? string.Empty);
                 response.Success = true;
                 response.Message = "Logout successful.";
-                Console.WriteLine($"Token invalidated for user: {logoutRequest.Username}");
-                // You can also send a response back to the client if needed
+                _connectionManager.UpdateConnectionId(connectionId, playerId);
+                _connectionManager.RemoveConnectionById(playerId);
+                await _logManager.CreateLogAsync("Info", $"Player logged out: {playerId}", playerId);
+                Console.WriteLine($"Token invalidated for user ID: {playerId}");
             }
             else
             {
                 response.Success = false;
-                response.ErrorMessage = "Invalid username.";
-                Console.WriteLine("Invalid username.");
-                // Handle the case where the username is not found
+                response.ErrorMessage = "Invalid token.";
+                Console.WriteLine("Invalid token.");
             }
-
+            Console.WriteLine($"token : {logoutRequest.Token}");
             // Serialize the response object and send it back to the client
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);

@@ -23,8 +23,8 @@ public class TcpClientExample
                     var signUpRequest = new SignUpRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "canodis",
-                        Password = "bulugu"
+                        Username = "1",
+                        Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(signUpRequest);
                     break;
@@ -33,8 +33,8 @@ public class TcpClientExample
                     var authenticationRequest = new AuthenticationRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "canodis",
-                        Password = "bulugu"
+                        Username = "1",
+                        Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
                     break;
@@ -42,7 +42,7 @@ public class TcpClientExample
                     var logoutRequest = new LogoutRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "canodis"
+                        Token = token
                     };
                     dataToSend = MessagePackSerializer.Serialize(logoutRequest);
                     break;
@@ -81,7 +81,6 @@ public class TcpClientExample
                             var signUpResponse = MessagePackSerializer.Deserialize<SignUpResponse>(buffer);
                             Console.WriteLine($"SignUp Response: Success = {signUpResponse.Success}, Message = {signUpResponse.Message}");
                             break;
-
                         case OperationType.LoginResponse:
                             var authenticationResponse = MessagePackSerializer.Deserialize<AuthenticationResponse>(buffer);
                             _token = authenticationResponse.Token;
@@ -117,7 +116,7 @@ public class TcpClientExample
     {
         //await SendRequest(OperationType.SignUpRequest);
         //await SendRequest(OperationType.LoginRequest);
-        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgwOGQxMDJjNTQ1ZmUzMGE0YmM5MjUiLCJuYmYiOjE3MDI5MzE2MjUsImV4cCI6MTcwMzUzNjQyNSwiaWF0IjoxNzAyOTMxNjI1fQ.wxwLFxsEdxTgx--ukKQteSAXoA5jH6JT-1JTYssO34Q");
-        //await SendRequest(OperationType.LogoutRequest);
+        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMxMDMwMTQsImV4cCI6MTcwMzcwNzgxNCwiaWF0IjoxNzAzMTAzMDE0fQ.7meebvw5dVuqz9WwHpLLsXzJQJydpRrdHbQDs2zh2GQ");
+        //await SendRequest(OperationType.LogoutRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMwOTY5ODksImV4cCI6MTcwMzcwMTc4OSwiaWF0IjoxNzAzMDk2OTg5fQ.c2pPzrw0ID2c7LRA5o-HYSqKMdglLC_M4W0bXPLFK-k");
     }
 }

@@ -11,7 +11,6 @@ public class ClientConnectionHandler
 
     public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], string>>? operationHandlers, ConnectionManager connectionManager, string connectionId)    {
         _client = client;
-        //using var networkStream = client.GetStream();
         _stream = client.GetStream();
         _operationHandlers = operationHandlers;
         _connectionManager = connectionManager;
@@ -119,6 +118,7 @@ public class ClientConnectionHandler
     /// <param name="operationType">The operation type to handle.</param>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes read from the network stream.</param>
+    /// <param name="connectionId">The temp id of the connection. It will change in the register function </param>
     private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, string connectionId)
     {
         // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
@@ -146,6 +146,6 @@ public class ClientConnectionHandler
     {
         _stream.Close();
         _client.Close();
-        _connectionManager.RemoveConnection(_connectionId);
+        _connectionManager.RemoveConnection(_client);
     }
 }

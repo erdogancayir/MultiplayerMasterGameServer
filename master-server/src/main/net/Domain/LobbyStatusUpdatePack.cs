@@ -4,10 +4,10 @@ using MessagePack;
 public class LobbyStatusUpdate : BasePack
 {
     [Key(1)]
-    public string LobbyID { get; set; }
+    public string? LobbyID { get; set; }
 
     [Key(2)]
-    public List<string> PlayerIDs { get; set; }
+    public List<string>? PlayerIDs { get; set; }
 
     [Key(3)]
     public bool IsGameStarting { get; set; }

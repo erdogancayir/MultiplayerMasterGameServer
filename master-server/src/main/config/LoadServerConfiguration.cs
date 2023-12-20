@@ -31,7 +31,7 @@ public class LoadServerConfiguration
             MaxPlayersPerLobby = 10,
             MaxLobbies = 5,
             SocketListenerPort = 8080,
-            JwtSecretKey = "secret-key"
+            JwtSecretKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32))
             // ...other settings
         };
     }

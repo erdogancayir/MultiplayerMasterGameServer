@@ -25,8 +25,20 @@ public class ConnectionManager
         }
     }
 
-    public void RemoveConnection(string playerId)
+    public void RemoveConnection(TcpClient client)
     {
-        _connections.Remove(playerId);
+        var playerId = _connections.FirstOrDefault(x => x.Value == client).Key;
+        if (playerId != null)
+        {
+            _connections.Remove(playerId);
+        }
+    }
+
+    public void RemoveConnectionById(string playerId)
+    {
+        if (_connections.ContainsKey(playerId))
+        {
+            _connections.Remove(playerId);
+        }
     }
 }

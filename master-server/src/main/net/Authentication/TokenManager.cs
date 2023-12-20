@@ -3,19 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-public interface ITokenStorage
-{
-    void StoreToken(string playerId, string token);
-    bool IsTokenValid(string token);
-    void RemoveToken(string playerId);
-    string? GetPlayerIdForToken(string token);
-    // Diğer metodlar...
-}
-
 
 public class TokenManager
 {
-    private readonly ITokenStorage _tokenStorage;
     private readonly string _secretKey; // Key used for JWT token generation
 
     /// <summary>
@@ -23,9 +13,8 @@ public class TokenManager
     /// </summary>
     /// <param name="tokenStorage">The token storage.</param>
     /// <param name="secretKey">The secret key used for JWT token generation.</param>
-    public TokenManager(ITokenStorage tokenStorage, string secretKey)
+    public TokenManager(string secretKey)
     {
-        _tokenStorage = tokenStorage;
         _secretKey = secretKey;
     }
 
@@ -51,8 +40,6 @@ public class TokenManager
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
 
-        _tokenStorage.StoreToken(player.PlayerID ?? string.Empty, tokenString);
-
         return tokenString;
     }
 
@@ -75,22 +62,15 @@ public class TokenManager
                 ValidateAudience = false,
                 ClockSkew = TimeSpan.Zero
             };
-            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-            return _tokenStorage.GetPlayerIdForToken(token);
+            ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            Claim playerIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier) ?? throw new Exception("Player ID claim not found.");
+
+            return playerIdClaim?.Value;
         }
         catch
         {
             return null;
         }
-    }
-
-    /// <summary>
-    /// Invalidates a token for a specific player.
-    /// </summary>
-    /// <param name="playerId">The ID of the player whose token is to be invalidated.</param>
-    public void InvalidateToken(string playerId)
-    {
-        _tokenStorage.RemoveToken(playerId);
     }
 }

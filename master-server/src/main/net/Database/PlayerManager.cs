@@ -60,7 +60,6 @@ public class PlayerManager
             PasswordHash = HashPassword(password),
             RegistrationDate = DateTime.UtcNow, 
             LastLoginDate = DateTime.UtcNow
-            // Initialize other fields as necessary
         };
 
         try
@@ -117,12 +116,20 @@ public class PlayerManager
         return _tokenManager.GenerateToken(player);
     }
 
-    public async void InvalidateToken(string playerId)
+    public async Task InvalidateToken(string playerId)
     {
-        _tokenManager.InvalidateToken(playerId);
-        // Burada loglama yapılabilir.
-        await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}", playerId);    
+        try
+        {
+            // Assuming _tokenStorage is an instance of ITokenStorage
+            await _logManager.CreateLogAsync("Info", $"Token invalidated for player ID: {playerId}", playerId);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            Console.WriteLine($"Error invalidating token: {ex.Message}");
+        }
     }
+
 
     public async Task<List<Player>> GetPlayersByIdsAsync(List<string> playerIds)
     {
@@ -133,5 +140,19 @@ public class PlayerManager
     public async Task<Player> GetPlayer(string playerID)
     {
         return await _players.Find(p => p.PlayerID == playerID).FirstOrDefaultAsync();
+    }
+
+    public async Task<string?> PlayerValidateToken(string token)
+    {
+        try
+        {
+            return await Task.FromResult(_tokenManager.ValidateToken(token));
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            Console.WriteLine($"Error validating token: {ex.Message}");
+            return null;
+        }
     }
 }

@@ -29,9 +29,11 @@ public class AuthenticationResponse : BasePack
 [MessagePackObject]
 public class LogoutRequest : BasePack
 {
+
     [Key(1)]
-    public string? Username { get; set; }
+    public string? Token { get; set; }
 }
+
 
 [MessagePackObject]
 public class LogoutResponse : BasePack

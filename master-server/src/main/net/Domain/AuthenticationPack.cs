@@ -4,7 +4,7 @@ using MessagePack;
 public class AuthenticationRequest : BasePack
 {
     [Key(1)]
-    public string? Username { get; set; }
+    public string Username { get; set; } = "";
 
     [Key(2)]
     public string? Password { get; set; } // Consider hashing the password.
@@ -30,8 +30,9 @@ public class AuthenticationResponse : BasePack
 [MessagePackObject]
 public class LogoutRequest : BasePack
 {
+
     [Key(1)]
-    public string? Username { get; set; }
+    public string? Token { get; set; }
 }
 
 

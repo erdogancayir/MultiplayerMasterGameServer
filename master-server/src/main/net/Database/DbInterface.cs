@@ -4,6 +4,11 @@ public class DbInterface
 {
     private readonly IMongoDatabase _database;
 
+    /// <summary>
+    /// Initializes a new instance of the DbInterface class.
+    /// </summary>
+    /// <param name="connectionString">The connection string for the database.</param>
+    /// <exception cref="InvalidOperationException">Thrown if the database connection fails.</exception>
     public DbInterface(string connectionString, string databaseName)
     {
         try
@@ -24,6 +29,4 @@ public class DbInterface
     {
         return _database.GetCollection<T>(name);
     }
-
-    // ... Additional CRUD operations go here ...
 }

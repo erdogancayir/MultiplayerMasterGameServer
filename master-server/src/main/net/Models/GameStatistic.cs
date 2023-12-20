@@ -5,8 +5,10 @@ public class GameStatistic
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string StatID { get; set; }
+    public string? GameStatisticsID { get; set; }
 
-    public string PlayerID { get; set; }
-    public string GameID { get; set; }
+    public string? PlayerID { get; set; }
+    public string? GameID { get; set; }
+    public int Rank { get; set; }
+    public int Points { get; set; } // Points awarded in the game
 }

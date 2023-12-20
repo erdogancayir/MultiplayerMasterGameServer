@@ -11,6 +11,14 @@ public class LogManager
         _logCollection = dbInterface.GetCollection<LogEntry>("Logs");
     }
 
+    /// <summary>
+    /// Creates a new log entry in the database.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="message"></param>
+    /// <param name="playerId"></param>
+    /// <param name="serverId"></param>
+    /// <returns></returns>
     public async Task CreateLogAsync(string type, string message, string? playerId = null, string? serverId = null)
     {
         var logEntry = new LogEntry

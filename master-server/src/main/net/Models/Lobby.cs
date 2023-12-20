@@ -10,7 +10,15 @@ public class Lobby
     public string? LobbyID { get; set; }
 
     public List<string>? Players { get; set; } // List of PlayerIDs
-    public string? Status { get; set; } // e.g., Waiting, Full, InGame
+    public LobbyStatus? Status { get; set; } // Now using the LobbyStatus enum
     public DateTime CreationTime { get; set; }
     public int MaxPlayers { get; set; }
+    public enum LobbyStatus
+    {
+        Waiting,
+        Full,
+        InGame,
+        Closed,
+        DefaultStatus
+    }
 }

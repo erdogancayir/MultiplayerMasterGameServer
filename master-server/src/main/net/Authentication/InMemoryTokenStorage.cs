@@ -5,7 +5,7 @@ using System.Security.Claims;
 /// <summary>
 /// In-memory implementation of <see cref="ITokenStorage"/>.
 /// </summary>
-public class InMemoryTokenStorage : ITokenStorage
+public class InMemoryTokenStorage
 {
     private readonly Dictionary<string, string> _tokens = new Dictionary<string, string>();
 

@@ -75,16 +75,21 @@ src
 │   │   ├── Database
 │   │   │   ├── DbInterface.cs
 │   │   │   ├── GameServerManager.cs
-│   │   │   ├── GameStateManager.cs
 │   │   │   ├── GameStatisticManager.cs
 │   │   │   ├── LobbyManager.cs
 │   │   │   ├── LogManager.cs
 │   │   │   ├── MatchmakingManager.cs
 │   │   │   ├── SessionManager.cs
+│   │   │   ├── GameManager.cs
+│   │   │   ├── GameStatisticsManager.cs
+│   │   │   ├── LeaderboardManager.cs
 │   │   │   └── PlayerManager.cs
 |   |   ├── Domain
 │   │   │   ├── AuthenticationPack.cs
 │   │   │   ├── BasePack.cs
+│   │   │   ├── GamePack.cs
+│   │   │   ├── LeaderboardEntryPack.cs
+│   │   │   ├── GameStatisticsPack.cs
 │   │   │   ├── GameServerAllocationPack.cs
 │   │   │   ├── GameStatePack.cs
 │   │   │   ├── GenericMessagePack.cs
@@ -100,17 +105,18 @@ src
 │   │   ├── Models
 │   │   │   ├── Lobby.cs
 |   |   |   ├── GameServer.cs
-|   |   |   ├── GameState.cs
 |   |   |   ├── GameStatistic.cs
 |   |   |   ├── LogEntry.cs
 |   |   |   ├── Matchmaking.cs
-|   |   |   ├── Session.cs
+|   |   |   ├── LeaderboardEntry.cs
+|   |   |   ├── GameStatistic.cs
+|   |   |   ├── Game.cs
 │   │   │   └── Player.cs
 │   │   ├── SocketListener
 │   │   │   ├── ConnectionHandler.cs
+│   │   │   ├── ConnectionManager.cs
 │   │   │   └── SocketListener.cs
 │   │   ├── Utilities
-│   │   │   ├── Logger.cs
 │   │   │   └── OperationTypes.cs
 |   |   └── Documents
 |   |       ├── ConfigDirectoryDocument.md
@@ -168,9 +174,6 @@ Server Components and Their Corresponding Classes
     Utilities (Utilities Directory)
         Logger.cs: Provides logging capabilities for server operations, errors, and player activities.
         Packet.cs: Handles data packet creation, manipulation, and reading for network communication, likely used across Socket Listener, Authentication, and Matchmaking services.
-
-
-
 
 1. Game Server Architecture Overview
 

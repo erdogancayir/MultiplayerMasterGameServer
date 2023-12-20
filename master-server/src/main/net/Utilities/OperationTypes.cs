@@ -25,6 +25,19 @@ public enum OperationType
     ServerStatusUpdate = 400,
     AllocateGameServer = 401,
 
+    // Game Operations
+    CreateGame = 450,
+    UpdateGame = 451,
+    GetGame = 452,
+
+    // Game Statistics Operations
+    CreateGameStatistics = 453,
+    GetGameStatistics = 454,
+
+    // Leaderboard Operations
+    UpdateLeaderboardEntry = 455,
+    GetTopLeaderboardEntries = 456,
+
     // Heartbeat and Monitoring
     HeartbeatPing = 500,
     HeartbeatResponse = 501,
@@ -32,7 +45,4 @@ public enum OperationType
     // Multi-Server Operations
     ServerTransferRequest = 600,
     ServerTransferResponse = 601,
-
-    // Other Operations
-    CustomOperation = 700 // For future expansion or custom operations
 }

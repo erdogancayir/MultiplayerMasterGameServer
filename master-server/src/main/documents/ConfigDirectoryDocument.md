@@ -4,14 +4,14 @@ How These Components Work Together
     DatabaseConfig.cs: Optionally, holds specific database configurations if needed separately.
     LoadServerConfiguration.cs: Responsible for loading the actual configuration values from an external source (like configuration files or environment variables) and populating the ServerConfig object.
 
+ServerConfig.cs
 
-1. ServerConfig.cs
     This file should define a class that represents all the configurable settings of your server application. It acts as a container for various configuration properties.
 
-2. DatabaseConfig.cs
+DatabaseConfig.cs
 
-This file should specifically define configuration settings related to the database. Depending on your application's requirements, this might be integrated into ServerConfig.cs, or it could be separate if you have extensive database configurations.
+    This file should specifically define configuration settings related to the database. Depending on your application's requirements, this might be integrated into ServerConfig.cs, or it could be separate if you have extensive database configurations.
 
-3. LoadServerConfiguration.cs
-
-This file should contain logic to load the configuration settings, typically from a file (like appsettings.json or web.config) or environment variables. It populates the ServerConfig class with these settings.
+LoadServerConfiguration.cs
+    
+    This file should contain logic to load the configuration settings, typically from a file (like appsettings.json or web.config) or environment variables. It populates the ServerConfig class with these settings.

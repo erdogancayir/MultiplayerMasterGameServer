@@ -37,7 +37,6 @@ public class Matchmaker
             Console.WriteLine("Join lobby request received.");
             var joinLobbyRequest = MessagePackSerializer.Deserialize<MatchmakingRequest>(data);
             var playerId = _tokenManager.ValidateToken(joinLobbyRequest.Token);
-
             if (playerId == null)
             {
                 Console.WriteLine("Invalid token.");
@@ -81,7 +80,7 @@ public class Matchmaker
             var newLobby = new Lobby
             {
                 Players = new List<string> { playerId },
-                Status = "Waiting",
+                Status = Lobby.LobbyStatus.Waiting,
                 CreationTime = DateTime.UtcNow,
                 MaxPlayers = createLobbyRequest.MaxPlayers
             };
@@ -102,7 +101,7 @@ public class Matchmaker
     /// <returns>The found or newly created lobby.</returns>
     private Lobby FindOrCreateLobby(List<Lobby> lobbies, string playerId)
     {
-        var waitingLobby = lobbies.FirstOrDefault(l => l.Status == "Waiting");
+        var waitingLobby = lobbies.FirstOrDefault(l => l.Status == Lobby.LobbyStatus.Waiting);
         if (waitingLobby != null)
         {
             waitingLobby.Players?.Add(playerId);
@@ -112,7 +111,7 @@ public class Matchmaker
         var newLobby = new Lobby
         {
             Players = new List<string> { playerId },
-            Status = "Waiting",
+            Status = Lobby.LobbyStatus.Waiting,
             CreationTime = DateTime.UtcNow
         };
         lobbyManager.CreateLobby(newLobby).Wait();
@@ -125,86 +124,25 @@ public class Matchmaker
     /// <param name="lobby">The lobby to update.</param>
     private async Task UpdateLobbyStatus(Lobby lobby)
     {
-        bool wasFull = lobby.Status == "Full";
+        bool wasFull = lobby.Status == Lobby.LobbyStatus.Full;
         if (lobby.Players?.Count == lobby.MaxPlayers)
         {
-            lobby.Status = "Full";
+            lobby.Status = Lobby.LobbyStatus.Full;
         }
         else
         {
-            lobby.Status = "Waiting";
+            lobby.Status = Lobby.LobbyStatus.Waiting;
         }
 
-        await lobbyManager.UpdateLobby(lobby.LobbyID ?? string.Empty, lobby.Status);
+        // Default status is not persisted
+        await lobbyManager.UpdateLobby(lobby.LobbyID ?? string.Empty, lobby.Status ?? Lobby.LobbyStatus.DefaultStatus);
 
         // Notify players if the lobby has just become full
-        if (!wasFull && lobby.Status == "Full")
+        if (!wasFull && lobby.Status == Lobby.LobbyStatus.Full)
         {
             var playersInLobby = await RetrievePlayersInLobby(lobby.Players);
             await NotifyPlayersAboutLobbyAssignment(playersInLobby, lobby);
         }
-    }
-
-    private async Task<List<Player>> RetrievePlayersInLobby(List<string>? playerIDs)
-    {
-        if (playerIDs == null)
-        {
-            return new List<Player>();
-        }
-
-        var players = new List<Player>();
-        foreach (var playerID in playerIDs)
-        {
-            var player = await playerManager.GetPlayer(playerID);
-            if (player != null)
-            {
-                players.Add(player);
-            }
-        }
-        return players;
-    }
-
-    private async Task SendJoinLobbyResponse(NetworkStream stream, Lobby lobby)
-    {
-        var response = new MatchmakingResponse
-        {
-            OperationTypeId = (int)OperationType.JoinLobbyResponse,
-            Success = true,
-            LobbyID = lobby.LobbyID,
-            PlayerIDs = lobby.Players,
-            Status = lobby.Status
-        };
-        var responseData = MessagePackSerializer.Serialize(response);
-        await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
-    }
-
-    private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby)
-    {
-        var response = new CreateLobbyResponse
-        {
-            OperationTypeId = (int)OperationType.CreateLobbyResponse,
-            Success = true,
-            LobbyID = lobby.LobbyID,
-            PlayerIDs = lobby.Players,
-            Status = lobby.Status
-        };
-        var responseData = MessagePackSerializer.Serialize(response);
-        await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
-    }
-
-    private async Task SendErrorResponse(NetworkStream stream, string message)
-    {
-        var response = new MatchmakingResponse
-        {
-            OperationTypeId = (int)OperationType.JoinLobbyResponse,
-            Success = false,
-            ErrorMessage = message
-        };
-        var responseData = MessagePackSerializer.Serialize(response);
-        await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
     }
 
     /// <summary>
@@ -252,6 +190,68 @@ public class Matchmaker
         }
     }
 
+    private async Task<List<Player>> RetrievePlayersInLobby(List<string>? playerIDs)
+    {
+        if (playerIDs == null)
+        {
+            return new List<Player>();
+        }
+
+        var players = new List<Player>();
+        foreach (var playerID in playerIDs)
+        {
+            var player = await playerManager.GetPlayer(playerID);
+            if (player != null)
+            {
+                players.Add(player);
+            }
+        }
+        return players;
+    }
+
+    private async Task SendJoinLobbyResponse(NetworkStream stream, Lobby lobby)
+    {
+        var response = new MatchmakingResponse
+        {
+            OperationTypeId = (int)OperationType.JoinLobbyResponse,
+            Success = true,
+            LobbyID = lobby.LobbyID,
+            PlayerIDs = lobby.Players,
+            Status = lobby.Status?.ToString()
+        };
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
+    }
+
+    private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby)
+    {
+        var response = new CreateLobbyResponse
+        {
+            OperationTypeId = (int)OperationType.CreateLobbyResponse,
+            Success = true,
+            LobbyID = lobby.LobbyID,
+            PlayerIDs = lobby.Players,
+            Status = lobby.Status?.ToString()
+        };
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
+    }
+
+    private async Task SendErrorResponse(NetworkStream stream, string message)
+    {
+        var response = new MatchmakingResponse
+        {
+            OperationTypeId = (int)OperationType.JoinLobbyResponse,
+            Success = false,
+            ErrorMessage = message
+        };
+        var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+        //await SendMessage(stream, response);
+    }
+
     /// <summary>
     /// Retrieves the network stream associated with a given player ID.
     /// </summary>
@@ -273,11 +273,5 @@ public class Matchmaker
             Console.WriteLine($"Error retrieving stream for player {playerId}: {ex.Message}");
             return null;
         }
-    }
-
-    private async Task SendMessage(NetworkStream stream, BasePack response)
-    {
-        var responseData = MessagePackSerializer.Serialize(response);
-        await stream.WriteAsync(responseData, 0, responseData.Length);
     }
 }

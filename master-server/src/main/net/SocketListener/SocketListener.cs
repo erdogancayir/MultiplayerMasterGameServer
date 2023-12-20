@@ -31,13 +31,13 @@ public class SocketListener
     /// </summary>
     private void InitializeOperationHandlers()
     {
-        // Retrieves the authentication service from the service provider or throws an exception if not available.
-        var authService = _serviceProvider.GetService<IAuthService>()
-                     ?? throw new InvalidOperationException("AuthService not available.");
-        var lobbyManager = _serviceProvider.GetService<LobbyManager>()
-                     ?? throw new InvalidOperationException("LobbyManager not available.");
-        var matchmaker = _serviceProvider.GetService<Matchmaker>()
-                     ?? throw new InvalidOperationException("Matchmaker not available.");
+        // Retrieve services
+        var authService = GetService<AuthService>("AuthService");
+        var lobbyManager = GetService<LobbyManager>("LobbyManager");
+        var matchmaker = GetService<Matchmaker>("Matchmaker");
+        var gameManager = GetService<GameManager>("GameManager");
+        var gameStatisticsManager = GetService<GameStatisticsManager>("GameStatisticsManager");
+        var leaderboardManager = GetService<LeaderboardManager>("LeaderboardManager");
 
         // Mapping each operation type to its corresponding handler.
         operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], string>>
@@ -47,8 +47,21 @@ public class SocketListener
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
-            // ... other mappings ...
+            { OperationType.CreateGame,  gameManager.HandleCreateGameRequest},
+            { OperationType.GetGame,  gameManager.HandleGetGameRequest},
+            { OperationType.GetGameStatistics, gameStatisticsManager.HandleGetGameStatisticsRequest},
+            { OperationType.GetTopLeaderboardEntries,  leaderboardManager.HandleGetTopLeaderboardEntriesRequest},
         };
+    }
+
+    /// <summary>
+    /// Retrieves a service from the service provider.
+    /// </summary>
+    /// <typeparam name="T">The type of the service.</typeparam>
+    private T GetService<T>(string serviceName)
+    {
+        return _serviceProvider.GetService<T>()
+               ?? throw new InvalidOperationException($"{serviceName} not available.");
     }
 
     /// <summary>
@@ -87,13 +100,12 @@ public class SocketListener
             TcpClient client = _listener.EndAcceptTcpClient(ar);
             string connectionId = Guid.NewGuid().ToString();
 
-            //son iki parametre eklendi
+            // Create a new client connection handler for the client
             var clientConnection = new ClientConnectionHandler(client, operationHandlers, _connectionManager, connectionId);
-            
+
             _connectionManager.AddConnection(connectionId, client);
 
             Task.Run(() => clientConnection.HandleNewConnection());
-            //Task.Run(() => HandleNewConnection(client));
             BeginAcceptClient();
         }
         catch (Exception ex)
