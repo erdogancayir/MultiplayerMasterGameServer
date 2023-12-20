@@ -22,11 +22,7 @@ GameServerManager Class
 LobbyManager Class
 
     Example Scenarios
-
     Lobby Creation: Players can create a lobby before starting a game. The CreateLobby method stores this lobby in the database.
-
     Lobby Update: When players are added to or leave the game lobby, the lobby information is updated.
-
     Lobby Query: When players want to view the available lobbies, LobbyManager can query the available lobbies.
-
     Lobby Delete: When a game ends or the lobby is no longer valid, the corresponding lobby can be deleted from the database.
