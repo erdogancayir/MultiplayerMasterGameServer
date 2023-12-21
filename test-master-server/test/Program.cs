@@ -114,9 +114,9 @@ public class TcpClientExample
 
     public static async Task Main(string[] args)
     {
-        //await SendRequest(OperationType.SignUpRequest);
-        //await SendRequest(OperationType.LoginRequest);
-        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMxMDMwMTQsImV4cCI6MTcwMzcwNzgxNCwiaWF0IjoxNzAzMTAzMDE0fQ.7meebvw5dVuqz9WwHpLLsXzJQJydpRrdHbQDs2zh2GQ");
+        await SendRequest(OperationType.SignUpRequest);
+        await SendRequest(OperationType.LoginRequest);
+        //await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMxMDMwMTQsImV4cCI6MTcwMzcwNzgxNCwiaWF0IjoxNzAzMTAzMDE0fQ.7meebvw5dVuqz9WwHpLLsXzJQJydpRrdHbQDs2zh2GQ");
         //await SendRequest(OperationType.LogoutRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMwOTY5ODksImV4cCI6MTcwMzcwMTc4OSwiaWF0IjoxNzAzMDk2OTg5fQ.c2pPzrw0ID2c7LRA5o-HYSqKMdglLC_M4W0bXPLFK-k");
     }
 }

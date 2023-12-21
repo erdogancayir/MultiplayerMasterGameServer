@@ -50,6 +50,7 @@ namespace GameServer
             
             // Register TcpConnectionManager
             services.AddSingleton<TcpConnectionManager>();
+            services.AddSingleton<UdpConnectionManager>();
         }
     }
 }
