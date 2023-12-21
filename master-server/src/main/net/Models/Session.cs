@@ -8,7 +8,7 @@ public class Session
     [BsonRepresentation(BsonType.ObjectId)]
     public string SessionID { get; set; }
 
-    public string PlayerID { get; set; }
+    public int PlayerID { get; set; }
     public string Token { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; } // Nullable for ongoing sessions

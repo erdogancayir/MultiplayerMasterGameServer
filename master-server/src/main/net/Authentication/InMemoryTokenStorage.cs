@@ -7,10 +7,10 @@ using System.Security.Claims;
 /// </summary>
 public class InMemoryTokenStorage
 {
-    private readonly Dictionary<string, string> _tokens = new Dictionary<string, string>();
+    private readonly Dictionary<int, string> _tokens = new Dictionary<int, string>();
 
     /// <inheritdoc />
-    public void StoreToken(string playerId, string token)
+    public void StoreToken(int playerId, string token)
     {
         _tokens[playerId] = token;
     }
@@ -27,12 +27,12 @@ public class InMemoryTokenStorage
     }
 
     /// <inheritdoc />
-    public void RemoveToken(string playerId)
+    public void RemoveToken(int playerId)
     {
         _tokens.Remove(playerId);
     }
 
-    public string? GetPlayerIdForToken(string token)
+    public int? GetPlayerIdForToken(string token)
     {
         foreach (var kvp in _tokens)
         {

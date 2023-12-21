@@ -64,7 +64,7 @@ public class LobbyManager
     /// </summary>
     /// <param name="lobbyID">The unique identifier of the lobby to be updated.</param>
     /// <param name="players">The new list of players for the lobby.</param>
-    public async Task UpdateLobbyPlayers(string lobbyID, List<string> players)
+    public async Task UpdateLobbyPlayers(string? lobbyID, List<int> players)
     {
         var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyID);
         var update = Builders<Lobby>.Update.Set(l => l.Players, players);

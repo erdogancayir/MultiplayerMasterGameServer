@@ -30,14 +30,15 @@ public class Matchmaker
     /// <param name="stream">The network stream for communication.</param>
     /// <param name="data">The byte array data received in the request.</param>
     /// <param name="connectionId">The connection ID of the requesting client.</param>
-    public async void HandleJoinLobbyRequest(NetworkStream stream, byte[] data, string connectionId)
+    public async void HandleJoinLobbyRequest(NetworkStream stream, byte[] data, int connectionId)
     {
         try
         {
             Console.WriteLine("Join lobby request received.");
             var joinLobbyRequest = MessagePackSerializer.Deserialize<MatchmakingRequest>(data);
             var playerId = _tokenManager.ValidateToken(joinLobbyRequest.Token);
-            if (playerId == null)
+
+            if (playerId == null || playerId == 0) // playerId'nin geçerliliğini kontrol edin
             {
                 Console.WriteLine("Invalid token.");
                 await SendErrorResponse(stream, "Invalid token.");
@@ -45,8 +46,8 @@ public class Matchmaker
             }
 
             var allLobbies = await lobbyManager.GetLobbies();
-            var lobby = FindOrCreateLobby(allLobbies, playerId);
-            await lobbyManager.UpdateLobbyPlayers(lobby.LobbyID ?? string.Empty, lobby.Players ?? new List<string>());
+            var lobby = FindOrCreateLobby(allLobbies, playerId.Value); // Nullable int'in değerini kullanın
+            await lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
             await UpdateLobbyStatus(lobby);
             await SendJoinLobbyResponse(stream, lobby);
         }
@@ -62,7 +63,7 @@ public class Matchmaker
     /// <param name="stream">The network stream for communication.</param>
     /// <param name="data">The byte array data received in the request.</param>
     /// <param name="connectionId">The connection ID of the requesting client.</param>
-    public async void CreateLobby(NetworkStream stream, byte[] data, string connectionId)
+    public async void CreateLobby(NetworkStream stream, byte[] data, int connectionId)
     {
         try
         {
@@ -70,7 +71,8 @@ public class Matchmaker
             var createLobbyRequest = MessagePackSerializer.Deserialize<CreateLobbyRequest>(data);
             var playerId = _tokenManager.ValidateToken(createLobbyRequest.Token);
 
-            if (playerId == null)
+            // playerId'nin geçerli bir değer olup olmadığını kontrol edin
+            if (playerId == null || playerId == 0)
             {
                 Console.WriteLine("Invalid token.");
                 await SendErrorResponse(stream, "Invalid token.");
@@ -79,7 +81,8 @@ public class Matchmaker
 
             var newLobby = new Lobby
             {
-                Players = new List<string> { playerId },
+                // Null olmadığından emin olduktan sonra playerId'nin değerini kullanın
+                Players = new List<int> { playerId.Value },
                 Status = Lobby.LobbyStatus.Waiting,
                 CreationTime = DateTime.UtcNow,
                 MaxPlayers = createLobbyRequest.MaxPlayers
@@ -99,7 +102,7 @@ public class Matchmaker
     /// <param name="lobbies">The list of current lobbies.</param>
     /// <param name="playerId">The ID of the player looking for a lobby.</param>
     /// <returns>The found or newly created lobby.</returns>
-    private Lobby FindOrCreateLobby(List<Lobby> lobbies, string playerId)
+    private Lobby FindOrCreateLobby(List<Lobby> lobbies, int playerId)
     {
         var waitingLobby = lobbies.FirstOrDefault(l => l.Status == Lobby.LobbyStatus.Waiting);
         if (waitingLobby != null)
@@ -110,13 +113,14 @@ public class Matchmaker
 
         var newLobby = new Lobby
         {
-            Players = new List<string> { playerId },
+            Players = new List<int> { playerId },
             Status = Lobby.LobbyStatus.Waiting,
             CreationTime = DateTime.UtcNow
         };
         lobbyManager.CreateLobby(newLobby).Wait();
         return newLobby;
     }
+
 
     /// <summary>
     /// Updates the status of a given lobby and notifies players if the lobby is full.
@@ -166,49 +170,44 @@ public class Matchmaker
         {
             try
             {
-                var playerStream = GetPlayerStream(player.PlayerID ?? string.Empty);
+                var playerStream = GetPlayerStream(player.PlayerID); // PlayerID artık null olamaz
                 if (playerStream == null)
                 {
-                    Console.WriteLine($"No stream found for player {player.PlayerID}");
+                    Console.WriteLine($"No stream found for player with ID: {player.PlayerID}");
                     continue;
                 }
 
-                var gameStartResponese = new GameStartResponese
+                var gameStartResponse = new GameStartResponese
                 {
                     OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerCount = lobby.Players?.Count ?? 0,
                 };
 
-                var responseData = MessagePackSerializer.Serialize(gameStartResponese);
+                var responseData = MessagePackSerializer.Serialize(gameStartResponse);
                 await playerStream.WriteAsync(responseData, 0, responseData.Length);
-                Console.WriteLine($"Lobby assignment notification sent to player {player.PlayerID}");
+                Console.WriteLine($"Lobby assignment notification sent to player with ID: {player.PlayerID}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending lobby assignment to player {player.PlayerID}: {ex.Message}");
+                Console.WriteLine($"Error sending lobby assignment to player with ID: {player.PlayerID}: {ex.Message}");
             }
         }
     }
 
-    private async Task<List<Player>> RetrievePlayersInLobby(List<string>? playerIDs)
+
+    private async Task<List<Player>> RetrievePlayersInLobby(List<int>? playerIDs)
     {
-        if (playerIDs == null)
+        if (playerIDs == null || playerIDs.Count == 0)
         {
             return new List<Player>();
         }
-
-        var players = new List<Player>();
-        foreach (var playerID in playerIDs)
-        {
-            var player = await playerManager.GetPlayer(playerID);
-            if (player != null)
-            {
-                players.Add(player);
-            }
-        }
-        return players;
+    
+        var playerTasks = playerIDs.Select(playerID => playerManager.GetPlayer(playerID)).ToList();
+        var players = await Task.WhenAll(playerTasks);
+    
+        return players.Where(player => player != null).ToList();
     }
-
+    
     private async Task SendJoinLobbyResponse(NetworkStream stream, Lobby lobby)
     {
         var response = new MatchmakingResponse
@@ -261,7 +260,7 @@ public class Matchmaker
     /// This method attempts to find the TcpClient associated with the given player ID 
     /// and return its network stream. If the client or stream cannot be found, null is returned.
     /// </remarks>
-    private NetworkStream? GetPlayerStream(string playerId)
+    private NetworkStream? GetPlayerStream(int playerId)
     {
         try
         {

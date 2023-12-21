@@ -5,12 +5,19 @@ using System;
 public class Player
 {
     [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? PlayerID { get; set; }
-
+    [BsonRepresentation(BsonType.Int32)]
+    public int PlayerID { get; set; }
     public string? Username { get; set; }
     public string? PasswordHash { get; set; }
     public DateTime RegistrationDate { get; set; }
     public DateTime LastLoginDate { get; set; }
     // Additional profile data can be added here
+}
+
+public class Counter
+{
+    [BsonId]
+    [BsonRepresentation(BsonType.String)]
+    public string Id { get; set; }
+    public int SeqValue { get; set; }
 }

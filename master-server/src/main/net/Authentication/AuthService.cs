@@ -26,16 +26,17 @@ public class AuthService
     /// </summary>
     /// <param name="data">The byte array containing the serialized sign-up request data.</param>
     /// <param name="bytesRead">The number of bytes read from the stream.</param>
-    public async void HandleSignUpRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleSignUpRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
         try
         {
             Console.WriteLine("Sign up request received.");
-            // Deserialize the received data into a SignUpRequest object
             var signUpRequest = MessagePackSerializer.Deserialize<SignUpRequest>(data);
-            var response = new SignUpResponse();
-            response.OperationTypeId = (int)OperationType.SignUpResponse;
-            // Check if the username is available
+            var response = new SignUpResponse
+            {
+                OperationTypeId = (int)OperationType.SignUpResponse
+            };
+
             if (!await _playerManager.IsUsernameAvailable(signUpRequest.Username))
             {
                 response.Success = false;
@@ -50,7 +51,7 @@ public class AuthService
                     response.Success = true;
                     response.Message = "Player successfully created.";
                     var playerId = await _playerManager.GetPlayerIdByUsername(signUpRequest.Username);
-                    // Update the connection ID with the real id in the connection manager
+                    // playerId artık int türünde olduğu için doğrudan kullanılıyor
                     _connectionManager.UpdateConnectionId(connectionId, playerId);
                     Console.WriteLine(response.Message);
                 }
@@ -62,7 +63,6 @@ public class AuthService
                 }
             }
 
-            // Serialize the response object and send it back to the client
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
@@ -78,25 +78,25 @@ public class AuthService
     /// <param name="clientStream">The network stream to communicate with the client.</param>
     /// <param name="data">The byte array containing the serialized login request data.</param>
     /// <param name="bytesRead">The number of bytes read from the stream.</param>
-    public async void HandleLoginRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleLoginRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
         try
         {
             Console.WriteLine("Login request received.");
-            // Deserialize the received data into an AuthenticationRequest object
             var loginRequest = MessagePackSerializer.Deserialize<AuthenticationRequest>(data);
-            var response = new AuthenticationResponse();
-            response.OperationTypeId = (int)OperationType.LoginResponse;
-            // Validate the username and password
+            var response = new AuthenticationResponse
+            {
+                OperationTypeId = (int)OperationType.LoginResponse
+            };
+
             var player = await _playerManager.GetPlayerByUsernameAsync(loginRequest.Username);
             if (player != null && _playerManager.ValidatePassword(player.PasswordHash, loginRequest.Password))
             {
                 response.Success = true;
                 response.Token = _playerManager.GenerateToken(player);
                 response.Message = "Login successful.";
-                var playerId = await _playerManager.GetPlayerIdByUsername(loginRequest.Username);
-                // Update the connection ID with the real id in the connection manager
-                _connectionManager.UpdateConnectionId(connectionId, playerId);
+                // Burada doğrudan player.PlayerID kullanılıyor
+                _connectionManager.UpdateConnectionId(connectionId, player.PlayerID);
                 Console.WriteLine(response.Message);
                 await _logManager.CreateLogAsync("Info", $"Player logged in: {loginRequest.Username}", player.PlayerID);
             }
@@ -107,7 +107,6 @@ public class AuthService
                 Console.WriteLine(response.ErrorMessage);
             }
 
-            // Serialize the response object and send it back to the client
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
@@ -117,24 +116,27 @@ public class AuthService
         }
     }
 
-    public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, string connectionId)
+
+    public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
         try
         {
             Console.WriteLine("Logout request received.");
-            // Deserialize the received data into a LogoutRequest object
             var logoutRequest = MessagePackSerializer.Deserialize<LogoutRequest>(data);
-            var response = new LogoutResponse();
-            response.OperationTypeId = (int)OperationType.LogoutResponse;
-            // Validate the token
+            var response = new LogoutResponse
+            {
+                OperationTypeId = (int)OperationType.LogoutResponse
+            };
+
             var playerId = await _playerManager.PlayerValidateToken(logoutRequest.Token ?? "");
-            if (!string.IsNullOrEmpty(playerId))
+
+            if (playerId.HasValue && playerId != 0)
             {
                 response.Success = true;
                 response.Message = "Logout successful.";
-                _connectionManager.UpdateConnectionId(connectionId, playerId);
-                _connectionManager.RemoveConnectionById(playerId);
-                await _logManager.CreateLogAsync("Info", $"Player logged out: {playerId}", playerId);
+                _connectionManager.UpdateConnectionId(connectionId, playerId.Value);
+                _connectionManager.RemoveConnectionById(playerId.Value);
+                await _logManager.CreateLogAsync("Info", $"Player logged out: {playerId}", playerId.Value);
                 Console.WriteLine($"Token invalidated for user ID: {playerId}");
             }
             else
@@ -143,16 +145,17 @@ public class AuthService
                 response.ErrorMessage = "Invalid token.";
                 Console.WriteLine("Invalid token.");
             }
+
             Console.WriteLine($"token : {logoutRequest.Token}");
-            // Serialize the response object and send it back to the client
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error processing logout request: {ex.Message}");
-            // Handle exceptions and possibly send an error response to the client
+            // Error handling logic
         }
     }
+
 
 }

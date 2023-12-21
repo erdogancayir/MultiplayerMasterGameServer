@@ -8,20 +8,19 @@ public class UdpConnectionHandler
 {
     private UdpClient _udpClient;
     private readonly int _udpPort;
-    private ConcurrentDictionary<string, UdpConnectionManager> _connectedPlayers;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
-    private readonly UdpConnectionManager _udpConnectionManager;
     private readonly ILogger<UdpConnectionHandler> _logger;
+    private readonly PositionManager _positionManager;
 
-    public UdpConnectionHandler(int udpPort, UdpConnectionManager udpConnectionManager, 
+    public UdpConnectionHandler(int udpPort, 
                                 Dictionary<OperationType, Action<IPEndPoint, byte[]>>? udpOperationHandlers, 
-                                ILogger<UdpConnectionHandler> logger)
+                                ILogger<UdpConnectionHandler> logger,
+                                PositionManager positionManager)
     {
         _udpPort = udpPort;
         _udpClient = new UdpClient(_udpPort);
         _udpOperationHandlers = udpOperationHandlers;
-        _udpConnectionManager = udpConnectionManager;
-        _connectedPlayers = new ConcurrentDictionary<string, UdpConnectionManager>();
+        _positionManager = positionManager;
         _logger = logger;
     }
 
@@ -95,9 +94,10 @@ public class UdpConnectionHandler
         try
         {
             var playerPositionUpdate = MessagePackSerializer.Deserialize<PlayerPositionUpdate>(data);
+            int playerId = int.Parse(playerPositionUpdate.PlayerId); // Ensure playerId is an int
 
-            UpdatePlayerPosition(playerPositionUpdate.PlayerId, playerPositionUpdate.X, playerPositionUpdate.Y);
-            BroadcastPlayerPosition(playerPositionUpdate.PlayerId, playerPositionUpdate.X, playerPositionUpdate.Y);
+            UpdatePlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
+            BroadcastPlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
         }
         catch (Exception ex)
         {
@@ -105,37 +105,33 @@ public class UdpConnectionHandler
         }
     }
 
-
-     // Placeholder for broadcasting player position to other players
-    private void BroadcastPlayerPosition(string playerId, float x, float y)
+    private void BroadcastPlayerPosition(int playerId, float x, float y)
     {
         var playerPositionUpdate = new PlayerPositionUpdate
         {
-            PlayerId = playerId,
+            PlayerId = playerId.ToString(),
             X = x,
             Y = y
         };
 
         var data = MessagePackSerializer.Serialize(playerPositionUpdate);
 
-        foreach (var player in _connectedPlayers.Values)
+        foreach (var kvp in _positionManager.GetAllPlayers())
         {
-            if (player.PlayerId != playerId)
+            if (kvp.Key != playerId)
             {
-                // SendMessage metodu, UDP üzerinden veri gönderme işlemini gerçekleştirmeli
-                player.SendMessage(data);
+                _positionManager.SendMessageToPlayer(kvp.Key, data); // Adjusted to use PositionManager
             }
         }
     }
 
-
-    // Oyuncu pozisyonunu güncellemek için
-    public void UpdatePlayerPosition(string playerId, float x, float y)
+    public void UpdatePlayerPosition(int playerId, float x, float y)
     {
-        if (_connectedPlayers.TryGetValue(playerId, out var udpConnection))
+        if (_positionManager.TryGetPlayerData(playerId, out PlayerData playerData))
         {
-            udpConnection.X = x;
-            udpConnection.Y = y;
+            playerData.X = x;
+            playerData.Y = y;
+            _positionManager.AddOrUpdatePlayer(playerId, playerData);
         }
     }
     private void AddOrUpdatePlayer(IPEndPoint endPoint, byte[] receivedBytes)
@@ -143,26 +139,18 @@ public class UdpConnectionHandler
         try
         {
             var playerPositionUpdate = MessagePackSerializer.Deserialize<PlayerPositionUpdate>(receivedBytes);
-            string playerId = playerPositionUpdate.PlayerId;
+            int playerId = int.Parse(playerPositionUpdate.PlayerId); // Convert playerId to int
 
-            if (!_connectedPlayers.TryGetValue(playerId, out var udpConnection))
+            var playerData = new PlayerData
             {
-                // add the new player to the connected players dictionary
-                udpConnection = new UdpConnectionManager
-                {
-                    PlayerId = playerId,
-                    EndPoint = endPoint,
-                    X = playerPositionUpdate.X,
-                    Y = playerPositionUpdate.Y
-                };
-                _connectedPlayers[playerId] = udpConnection;
-            }
-            else
-            {
-                // update the existing player's position
-                udpConnection.X = playerPositionUpdate.X;
-                udpConnection.Y = playerPositionUpdate.Y;
-            }
+                PlayerId = playerId,
+                EndPoint = endPoint,
+                X = playerPositionUpdate.X,
+                Y = playerPositionUpdate.Y
+                // Add other necessary fields like LobbyId if applicable
+            };
+
+            _positionManager.AddOrUpdatePlayer(playerId, playerData);
         }
         catch (Exception ex)
         {

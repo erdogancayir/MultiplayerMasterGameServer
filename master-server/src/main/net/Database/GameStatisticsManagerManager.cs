@@ -10,7 +10,7 @@ public class GameStatisticsManager
         _gameStatistics = dbInterface.GetCollection<GameStatistic>("GameStatistics");
     }
 
-    public async void HandleGetGameStatisticsRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleGetGameStatisticsRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
     }
 

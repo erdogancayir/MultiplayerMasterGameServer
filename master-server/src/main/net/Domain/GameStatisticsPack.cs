@@ -10,7 +10,7 @@ public class GameStatisticsPack : BasePack
     public string? GameID { get; set; }
 
     [Key(3)]
-    public string? PlayerID { get; set; }
+    public int? PlayerID { get; set; }
 
     [Key(4)]
     public int Rank { get; set; }

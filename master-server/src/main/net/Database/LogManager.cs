@@ -19,7 +19,7 @@ public class LogManager
     /// <param name="playerId"></param>
     /// <param name="serverId"></param>
     /// <returns></returns>
-    public async Task CreateLogAsync(string type, string message, string? playerId = null, string? serverId = null)
+    public async Task CreateLogAsync(string type, string message, int? playerId = null, string? serverId = null)
     {
         var logEntry = new LogEntry
         {
