@@ -11,33 +11,16 @@ public class SocketListener
     private TcpListener? _tcpListener;
     private readonly IServiceProvider _serviceProvider;
     private readonly TcpConnectionManager _tcpConnectionManager;
-    private Dictionary<OperationType, Action<NetworkStream ,byte[], string>>? _tcpOperationHandlers;
-    private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
     private UdpConnectionHandler _udpConnectionHandler;
+    private Random _random = new Random();
 
     public SocketListener(int tcpPort, int udpPort, IServiceProvider serviceProvider)
     {
         _tcpPort = tcpPort;
         _udpPort = udpPort;
         _serviceProvider = serviceProvider;
-        _udpConnectionHandler = new UdpConnectionHandler(_udpPort, _udpOperationHandlers, _serviceProvider.GetRequiredService<PositionManager>());
-        InitializeUdpOperationHandlers();
+        _udpConnectionHandler = new UdpConnectionHandler(_udpPort, _serviceProvider.GetRequiredService<PositionManager>());
         _tcpConnectionManager = _serviceProvider.GetRequiredService<TcpConnectionManager>();
-        InitializeTcpOperationHandlers();
-    }
-
-    private void InitializeTcpOperationHandlers()
-    {
-        // TCP operation handlers initialization
-    }
-
-    private void InitializeUdpOperationHandlers()
-    {
-        
-        _udpOperationHandlers = new Dictionary<OperationType, Action<IPEndPoint, byte[]>>
-        {
-            { OperationType.PlayerPositionUpdate, _udpConnectionHandler.HandlePlayerPositionUpdate }
-        };
     }
 
     public void Start()
@@ -73,10 +56,10 @@ public class SocketListener
             TcpClient tcpClient = _tcpListener.EndAcceptTcpClient(ar);
 
             // Get the connection temp ID for the client
-            string connectionId = Guid.NewGuid().ToString();
+            int connectionId = _random.Next();
 
             // Create a new TCP connection handler for the client
-            var clientConnection = new TcpConnectionHandler(tcpClient, _tcpOperationHandlers, _tcpConnectionManager, connectionId);
+            var clientConnection = new TcpConnectionHandler(tcpClient, _tcpConnectionManager, connectionId, _serviceProvider.GetRequiredService<PositionManager>());
 
             // Handle the TCP client in a new task or thread
             Task.Run(() => clientConnection.HandleNewConnection());

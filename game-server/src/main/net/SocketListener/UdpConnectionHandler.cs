@@ -14,13 +14,20 @@ public class UdpConnectionHandler
     private readonly PositionManager _positionManager;
 
     public UdpConnectionHandler(int udpPort, 
-                                Dictionary<OperationType, Action<IPEndPoint, byte[]>>? udpOperationHandlers, 
                                 PositionManager positionManager)
     {
         _udpPort = udpPort;
         _udpClient = new UdpClient(_udpPort);
-        _udpOperationHandlers = udpOperationHandlers;
         _positionManager = positionManager;
+        InitializeUdpOperationHandlers();
+    }
+
+    private void InitializeUdpOperationHandlers()
+    {
+        _udpOperationHandlers = new Dictionary<OperationType, Action<IPEndPoint, byte[]>>
+        {
+            { OperationType.PlayerPositionUpdate, HandlePlayerPositionUpdate }
+        };
     }
 
     public void StartListening()
@@ -50,7 +57,6 @@ public class UdpConnectionHandler
 
             if (remoteEndPoint != null)
             {
-                AddOrUpdatePlayer(remoteEndPoint, receivedBytes);
                 ParseAndHandleUdpData(receivedBytes, remoteEndPoint);
                 BeginReceiveUdp();
             }
@@ -95,6 +101,8 @@ public class UdpConnectionHandler
             var playerPositionUpdate = MessagePackSerializer.Deserialize<PlayerPositionUpdate>(data);
             int playerId = playerPositionUpdate.PlayerId;
 
+            Console.WriteLine($"Received player position update from player {playerId}.");
+            Console.WriteLine($"X: {playerPositionUpdate.X}, Y: {playerPositionUpdate.Y}");
             UpdatePlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
             BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate);
         }
@@ -111,7 +119,7 @@ public class UdpConnectionHandler
         if (_positionManager.TryGetPlayerData(playerId, out PlayerData playerData))
         {
             // Broadcast the position update to all players in the same lobby
-            _positionManager.SendMessageToLobby(playerData.LobbyId, data);
+            _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data);
         }
     }
 
@@ -122,29 +130,6 @@ public class UdpConnectionHandler
             playerData.X = x;
             playerData.Y = y;
             _positionManager.AddOrUpdatePlayer(playerId, playerData);
-        }
-    }
-
-    private void AddOrUpdatePlayer(IPEndPoint endPoint, byte[] receivedBytes)
-    {
-        try
-        {
-            var playerLobbyInfo = MessagePackSerializer.Deserialize<PlayerLobbyInfo>(receivedBytes);
-
-            var playerData = new PlayerData
-            {
-                PlayerId = playerLobbyInfo.PlayerId,
-                LobbyId = playerLobbyInfo.LobbyId,
-                EndPoint = endPoint,
-                X = playerLobbyInfo.X,
-                Y = playerLobbyInfo.Y
-            };
-
-            _positionManager.AddOrUpdatePlayer(playerLobbyInfo.PlayerId, playerData);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in AddOrUpdatePlayer: {ex}");
         }
     }
 }

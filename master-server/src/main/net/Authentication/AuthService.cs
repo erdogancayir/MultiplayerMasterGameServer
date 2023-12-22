@@ -62,7 +62,6 @@ public class AuthService
                     Console.WriteLine(response.Message);
                 }
             }
-
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }

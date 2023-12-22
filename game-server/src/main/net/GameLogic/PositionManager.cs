@@ -3,13 +3,13 @@ using System.Net.Sockets;
 public class PositionManager
 {
     private Dictionary<int, PlayerData> _playerData;
-    private Dictionary<int, List<int>> _lobbyPlayers; // New: LobbyId -> List of PlayerIds
+    private Dictionary<string, List<int>> _lobbyPlayers; // int : Lobby id New: PlayerIds -> List of PlayerIds
     private UdpClient _udpClient;
 
     public PositionManager()
     {
         _playerData = new Dictionary<int, PlayerData>();
-        _lobbyPlayers = new Dictionary<int, List<int>>();
+        _lobbyPlayers = new Dictionary<string, List<int>>();
         _udpClient = new UdpClient();
     }
 
@@ -40,13 +40,13 @@ public class PositionManager
         }
     }
 
-    public async Task SendMessageToLobby(int lobbyId, byte[] message)
+    public async Task SendMessageToLobby(int ownPlayerId, string lobbyId, byte[] message)
     {
         if (_lobbyPlayers.TryGetValue(lobbyId, out List<int> playerIds))
         {
             foreach (var playerId in playerIds)
             {
-                if (_playerData.TryGetValue(playerId, out PlayerData playerData))
+                if (ownPlayerId != playerId && _playerData.TryGetValue(playerId, out PlayerData playerData))
                 {
                     await _udpClient.SendAsync(message, message.Length, playerData.EndPoint);
                 }

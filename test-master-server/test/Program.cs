@@ -23,7 +23,7 @@ public class TcpClientExample
                     var signUpRequest = new SignUpRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "122",
+                        Username = "ggg",
                         Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(signUpRequest);
@@ -33,7 +33,7 @@ public class TcpClientExample
                     var authenticationRequest = new AuthenticationRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "122",
+                        Username = "ggg",
                         Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
@@ -114,9 +114,9 @@ public class TcpClientExample
 
     public static async Task Main(string[] args)
     {
-        //await SendRequest(OperationType.SignUpRequest);
-        await SendRequest(OperationType.LoginRequest);
-        await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyIiwibmJmIjoxNzAzMjAyMzY4LCJleHAiOjE3MDM4MDcxNjgsImlhdCI6MTcwMzIwMjM2OH0.zx7E5zviMrQyb4eXMPePkhxUdBt853M2k7n-7gP5uNE");
+        await SendRequest(OperationType.SignUpRequest);
+        //await SendRequest(OperationType.LoginRequest);
+        //await SendRequest(OperationType.JoinLobbyRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyIiwibmJmIjoxNzAzMjAyMzY4LCJleHAiOjE3MDM4MDcxNjgsImlhdCI6MTcwMzIwMjM2OH0.zx7E5zviMrQyb4eXMPePkhxUdBt853M2k7n-7gP5uNE");
         //await SendRequest(OperationType.LogoutRequest, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2NTgzMzEzMGFmNjZlNjM1NmVjMmEyM2EiLCJuYmYiOjE3MDMwOTY5ODksImV4cCI6MTcwMzcwMTc4OSwiaWF0IjoxNzAzMDk2OTg5fQ.c2pPzrw0ID2c7LRA5o-HYSqKMdglLC_M4W0bXPLFK-k");
     }
 }

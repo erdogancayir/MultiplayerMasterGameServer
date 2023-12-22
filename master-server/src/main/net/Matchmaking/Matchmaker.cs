@@ -170,15 +170,16 @@ public class Matchmaker
         {
             try
             {
-                var playerStream = GetPlayerStream(player.PlayerID); // PlayerID artık null olamaz
+                var playerStream = GetPlayerStream(player.PlayerID);
                 if (playerStream == null)
                 {
                     Console.WriteLine($"No stream found for player with ID: {player.PlayerID}");
                     continue;
                 }
 
-                var gameStartResponse = new GameStartResponese
+                var gameStartResponse = new GameStartResponse
                 {
+                    PlayerId = player.PlayerID,
                     OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerCount = lobby.Players?.Count ?? 0,
                 };
@@ -193,7 +194,6 @@ public class Matchmaker
             }
         }
     }
-
 
     private async Task<List<Player>> RetrievePlayersInLobby(List<int>? playerIDs)
     {

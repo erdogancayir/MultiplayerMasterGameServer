@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using MessagePack;
 
 public class HeartbeatManager
 {
@@ -11,7 +12,6 @@ public class HeartbeatManager
     {
         _dbInterface = dbInterface;
         _gameServers = gameServers;
-        // Timer ve diğer başlangıç işlemleri...
     }
 
     public void StartSendingHeartbeats()
@@ -32,15 +32,26 @@ public class HeartbeatManager
     {
         try
         {
+            if (server == null || server.IP == null)
+            {
+                throw new ArgumentNullException(nameof(server));
+            }
+
             using (var client = new TcpClient(server.IP, server.Port))
             {
-                var buffer = System.Text.Encoding.ASCII.GetBytes("heartbeat");
-                client.GetStream().Write(buffer, 0, buffer.Length);
+                var heartbeatMessage = new HeartbeatMessage
+                {
+                    OperationTypeId = (int)OperationType.HeartbeatPing,
+                    ServerID = server.ServerID,
+                    Timestamp = DateTime.UtcNow
+                };
+                var data = MessagePackSerializer.Serialize(heartbeatMessage);
+                NetworkStream stream = client.GetStream();
+                stream.Write(data, 0, data.Length);
             }
         }
         catch (Exception ex)
         {
-            // Sunucuyla iletişim kurulamadığında yapılacak işlemler
             Console.WriteLine($"Server {server.ServerID} is not responding: {ex.Message}");
         }
     }

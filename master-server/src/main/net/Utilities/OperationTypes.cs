@@ -15,7 +15,7 @@ public enum OperationType
     MatchmakingResponse = 203,
     CreateLobbyRequest = 204,
     CreateLobbyResponse = 205,
-    NotifyGameStart = 205,
+    NotifyGameStart = 206,
 
     // Lobby Management
     UpdateLobbyStatus = 300,

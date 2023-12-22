@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Sockets;
 using MessagePack;
 
@@ -5,27 +6,72 @@ public class TcpConnectionHandler
 {
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
-    private readonly Dictionary<OperationType, Action<NetworkStream, byte[], string>>? _operationHandlers;
+    private Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
     private TcpConnectionManager _tcpConnectionManager;
-    private string _connectionId;
+    private int _connectionId;
+    private readonly PositionManager _positionManager;
 
-    public TcpConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], string>>? operationHandlers, TcpConnectionManager connectionManager, string connectionId) {
+
+    public TcpConnectionHandler(TcpClient client, TcpConnectionManager connectionManager, int connectionId, PositionManager positionManager) {
         _client = client;
         //using var networkStream = client.GetStream();
         _stream = client.GetStream();
-        _operationHandlers = operationHandlers;
         _tcpConnectionManager = connectionManager;
         _connectionId = connectionId;
+        _positionManager = positionManager;
+        InitializeTcpOperationHandlers();
+    }
+
+    private void InitializeTcpOperationHandlers()
+    {
+        _operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
+        {
+            { OperationType.PlayerLobbyInfo, PlayerLobbyInfo },
+            { OperationType.HeartbeatPing, HeartbeatPing }
+        };
     }
 
     /// <summary>
-    /// Updates the connection id of the client.
+    /// Handles a heartbeat ping from the server.
     /// </summary>
-    /// <param name="newPlayerId"></param>
-    public void UpdateConnectionId(string newPlayerId)
+    public void HeartbeatPing(NetworkStream stream, byte[] data, int connectionId)
     {
-        _tcpConnectionManager.UpdateConnectionId(_connectionId, newPlayerId);
-        _connectionId = newPlayerId;
+        try
+        {
+            var heartbeatMessage = MessagePackSerializer.Deserialize<HeartbeatMessage>(data);
+            Console.WriteLine($"Heartbeat received from server {heartbeatMessage.ServerID} at {heartbeatMessage.Timestamp}.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing heartbeat message: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a player lobby info message from the server.
+    /// </summary>
+    public void PlayerLobbyInfo(NetworkStream stream, byte[] data, int connectionId)
+    {
+        try
+        {
+            var playerLobbyInfo = MessagePackSerializer.Deserialize<PlayerLobbyInfo>(data);
+            Console.WriteLine($"PlayerLobbyInfo: {playerLobbyInfo.PlayerId} {playerLobbyInfo.LobbyId}");
+
+            var _endpoint = _client.Client.RemoteEndPoint as IPEndPoint;
+
+            var playerData = new PlayerData
+            {
+                PlayerId = playerLobbyInfo.PlayerId,
+                LobbyId = playerLobbyInfo.LobbyId,
+                EndPoint = _endpoint ?? throw new InvalidOperationException("Endpoint is null."),
+            };
+            // Add the player to the position manager
+            _positionManager.AddOrUpdatePlayer(playerLobbyInfo.PlayerId, playerData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in AddOrUpdatePlayer: {ex}");
+        }
     }
 
     /// <summary>
@@ -47,6 +93,10 @@ public class TcpConnectionHandler
         }
     }
 
+    /// <summary>
+    /// Callback method for handling data received from a connected client.
+    /// </summary>
+    /// <param name="ar"></param>
     private void ReadCallBack(IAsyncResult ar)
     {
         if (ar.AsyncState is byte[] buffer)
@@ -82,7 +132,7 @@ public class TcpConnectionHandler
     /// </summary>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes actually read from the network stream.</param>
-    private void HandleReceivedData(byte[] data, int bytesRead, string connectionId)
+    private void HandleReceivedData(byte[] data, int bytesRead, int connectionId)
     {
         // Check if the received data is less than the size of an integer.
         if (bytesRead < sizeof(int))
@@ -119,7 +169,7 @@ public class TcpConnectionHandler
     /// <param name="operationType">The operation type to handle.</param>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes read from the network stream.</param>
-    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, string connectionId)
+    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, int connectionId)
     {
         // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
         var handler = _operationHandlers?.TryGetValue(operationType, out var tempHandler) == true ? tempHandler : null;

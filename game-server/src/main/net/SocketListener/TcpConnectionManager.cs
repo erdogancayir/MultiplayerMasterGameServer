@@ -2,21 +2,21 @@ using System.Net.Sockets;
 
 public class TcpConnectionManager
 {
-    private readonly Dictionary<string, TcpClient> _connections = new Dictionary<string, TcpClient>();
+    private readonly Dictionary<int, TcpClient> _connections = new Dictionary<int, TcpClient>();
 
-    public void AddConnection(string playerId, TcpClient client)
+    public void AddConnection(int playerId, TcpClient client)
     {
         _connections[playerId] = client;
     }
 
-    public TcpClient? GetConnection(string playerId)
+    public TcpClient? GetConnection(int playerId)
     {
         //Console.WriteLine("opssss");
         _connections.TryGetValue(playerId, out TcpClient? client);
         return client;
     }
 
-    public void UpdateConnectionId(string oldConnectionId, string newPlayerId)
+    public void UpdateConnectionId(int oldConnectionId, int newPlayerId)
     {
         if (_connections.TryGetValue(oldConnectionId, out TcpClient? client))
         {
@@ -25,7 +25,7 @@ public class TcpConnectionManager
         }
     }
 
-    public void RemoveConnection(string playerId)
+    public void RemoveConnection(int playerId)
     {
         _connections.Remove(playerId);
     }
