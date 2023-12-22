@@ -7,7 +7,7 @@ public class LeaderboardEntryPack : BasePack
     public string? LeaderboardEntryID { get; set; }
 
     [Key(2)]
-    public string? PlayerID { get; set; }
+    public int? PlayerID { get; set; }
 
     [Key(3)]
     public int TotalPoints { get; set; }

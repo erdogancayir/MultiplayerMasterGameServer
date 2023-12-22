@@ -10,12 +10,12 @@ public class GameManager
         _games = dbInterface.GetCollection<Game>("Games");
     }
 
-    public async void HandleCreateGameRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleCreateGameRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
 
     }
 
-    public async void HandleGetGameRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleGetGameRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
 
     }

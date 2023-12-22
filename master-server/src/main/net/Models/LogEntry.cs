@@ -11,6 +11,6 @@ public class LogEntry
     public DateTime Timestamp { get; set; }
     public string Type { get; set; } = string.Empty; // e.g., Error, Info, Warning
     public string Message { get; set; } = string.Empty;
-    public string? PlayerID { get; set; }
+    public int? PlayerID { get; set; }
     public string? ServerID { get; set; }
 }

@@ -40,16 +40,15 @@ namespace GameServer
             var configLoader = new LoadServerConfiguration();
             services.AddSingleton(configLoader.DbConfig);
             services.AddSingleton(configLoader.ServerConfig);
-
             // Assuming DbConfig has properties for the connection string and database name
             var dbConnectionString = configLoader.DbConfig.ConnectionString;
             var dbName = configLoader.DbConfig.DatabaseName;
-
             // Register DbInterface with necessary parameters
             services.AddSingleton<DbInterface>(provider => new DbInterface(dbConnectionString, dbName));
-            
             // Register TcpConnectionManager
+            services.AddSingleton<PositionManager>();
             services.AddSingleton<TcpConnectionManager>();
+            services.AddSingleton<UdpConnectionManager>();
         }
     }
 }

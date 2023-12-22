@@ -9,7 +9,7 @@ public class GameServerManager
     }
 
     // Oyuncuyu uygun bir oyun sunucusuna atama
-    public GameServer AllocatePlayerToServer(string playerId)
+    public GameServer AllocatePlayerToServer(int playerId)
     {
         // Burada, oyuncuyu uygun bir oyun sunucusuna atayacak algoritmanızı uygulayın
         // Örnek: Yük dengesi, oyun türüne göre seçim vb.

@@ -9,7 +9,8 @@ public class SocketListener
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
     private readonly ConnectionManager _connectionManager;
-    private Dictionary<OperationType, Action<NetworkStream ,byte[], string>>? operationHandlers;
+    private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
+    private Random _random = new Random();
     
     /// <summary>
     /// Initializes a new instance of the SocketListener class.
@@ -40,7 +41,7 @@ public class SocketListener
         var leaderboardManager = GetService<LeaderboardManager>("LeaderboardManager");
 
         // Mapping each operation type to its corresponding handler.
-        operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], string>>
+        operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
         {
             { OperationType.LoginRequest, authService.HandleLoginRequest },
             { OperationType.LogoutRequest, authService.HandleLogoutRequest },
@@ -98,7 +99,9 @@ public class SocketListener
         try
         {
             TcpClient client = _listener.EndAcceptTcpClient(ar);
-            string connectionId = Guid.NewGuid().ToString();
+
+            int connectionId = _random.Next();
+            //string connectionId = Guid.NewGuid().ToString();
 
             // Create a new client connection handler for the client
             var clientConnection = new ClientConnectionHandler(client, operationHandlers, _connectionManager, connectionId);

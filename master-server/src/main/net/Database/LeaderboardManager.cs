@@ -10,7 +10,7 @@ public class LeaderboardManager
         _leaderboard = dbInterface.GetCollection<LeaderboardEntry>("Leaderboard");
     }
 
-    public async void HandleGetTopLeaderboardEntriesRequest(NetworkStream clientStream, byte[] data, string connectionId)
+    public async void HandleGetTopLeaderboardEntriesRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
     }
 

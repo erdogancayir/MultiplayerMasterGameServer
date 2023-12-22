@@ -7,7 +7,7 @@ public class LobbyStatusUpdate : BasePack
     public string? LobbyID { get; set; }
 
     [Key(2)]
-    public List<string>? PlayerIDs { get; set; }
+    public List<int>? PlayerIDs { get; set; }
 
     [Key(3)]
     public bool IsGameStarting { get; set; }

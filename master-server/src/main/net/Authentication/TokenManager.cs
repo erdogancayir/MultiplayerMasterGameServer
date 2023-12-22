@@ -23,24 +23,22 @@ public class TokenManager
     /// </summary>
     /// <param name="player">The player for whom the token is generated.</param>
     /// <returns>A JWT token string.</returns>
-    public string GenerateToken(Player player)
+   public string GenerateToken(Player player)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_secretKey);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new Claim[] 
+            Subject = new ClaimsIdentity(new[] 
             {
-                new Claim(ClaimTypes.NameIdentifier, player.PlayerID ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, player.PlayerID.ToString()),
             }),
             Expires = DateTime.UtcNow.AddDays(7), // Token expiration time
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        var tokenString = tokenHandler.WriteToken(token);
-
-        return tokenString;
+        return tokenHandler.WriteToken(token);
     }
 
     /// <summary>
@@ -48,7 +46,7 @@ public class TokenManager
     /// </summary>
     /// <param name="token">The token to validate.</param>
     /// <returns>The player ID if valid; otherwise, null.</returns>
-    public string? ValidateToken(string token)
+    public int? ValidateToken(string token)
     {
         try
         {
@@ -64,9 +62,13 @@ public class TokenManager
             };
 
             ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-            Claim playerIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier) ?? throw new Exception("Player ID claim not found.");
+            var playerIdClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
-            return playerIdClaim?.Value;
+            if (playerIdClaim != null && int.TryParse(playerIdClaim.Value, out int playerId))
+            {
+                return playerId;
+            }
+            return null;
         }
         catch
         {

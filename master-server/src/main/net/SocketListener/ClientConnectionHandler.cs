@@ -5,11 +5,11 @@ public class ClientConnectionHandler
 {
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
-    private readonly Dictionary<OperationType, Action<NetworkStream, byte[], string>>? _operationHandlers;
+    private readonly Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
     private ConnectionManager _connectionManager;
-    private string _connectionId;
+    private int _connectionId;
 
-    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], string>>? operationHandlers, ConnectionManager connectionManager, string connectionId)    {
+    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers, ConnectionManager connectionManager, int connectionId)    {
         _client = client;
         _stream = client.GetStream();
         _operationHandlers = operationHandlers;
@@ -21,7 +21,7 @@ public class ClientConnectionHandler
     /// Updates the connection id of the client.
     /// </summary>
     /// <param name="newPlayerId"></param>
-    public void UpdateConnectionId(string newPlayerId)
+    public void UpdateConnectionId(int newPlayerId)
     {
         _connectionManager.UpdateConnectionId(_connectionId, newPlayerId);
         _connectionId = newPlayerId;
@@ -81,7 +81,7 @@ public class ClientConnectionHandler
     /// </summary>
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes actually read from the network stream.</param>
-    private void HandleReceivedData(byte[] data, int bytesRead, string connectionId)
+    private void HandleReceivedData(byte[] data, int bytesRead, int connectionId)
     {
         // Check if the received data is less than the size of an integer.
         if (bytesRead < sizeof(int))
@@ -93,6 +93,7 @@ public class ClientConnectionHandler
         {
             // Deserialize the data into a BasePack object to extract the OperationType.
             var basePack = MessagePackSerializer.Deserialize<BasePack>(data);
+
             OperationType operationType = (OperationType)basePack.OperationTypeId;
             Console.WriteLine($"OperationType: {operationType}");
 
@@ -119,7 +120,7 @@ public class ClientConnectionHandler
     /// <param name="data">The received data as a byte array.</param>
     /// <param name="bytesRead">The number of bytes read from the network stream.</param>
     /// <param name="connectionId">The temp id of the connection. It will change in the register function </param>
-    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, string connectionId)
+    private void InvokeHandlerForOperationType(OperationType operationType, byte[] data, int connectionId)
     {
         // Attempt to find the handler for the given operation type in the operationHandlers dictionary.
         var handler = _operationHandlers?.TryGetValue(operationType, out var tempHandler) == true ? tempHandler : null;

@@ -21,6 +21,9 @@ namespace MasterServer
                 // Build the service provider
                 var serviceProvider = serviceCollection.BuildServiceProvider();
 
+                // Initialize counters
+                InitializeCounters(serviceProvider).GetAwaiter().GetResult();
+
                 var serverConfig = serviceProvider.GetService<ServerConfig>();
                 if (serverConfig == null)
                 {
@@ -93,6 +96,12 @@ namespace MasterServer
                 new LeaderboardManager(provider.GetRequiredService<DbInterface>()));
         }
         #endregion
+
+        private static async Task InitializeCounters(IServiceProvider serviceProvider)
+        {
+            var playerManager = serviceProvider.GetRequiredService<PlayerManager>();
+            await playerManager.InitializeCounterAsync();
+        }
 
         /// <summary>
         /// Keeps the server running, handling logic for a graceful shutdown.

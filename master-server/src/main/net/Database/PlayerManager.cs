@@ -7,6 +7,8 @@ public class PlayerManager
 
     private readonly TokenManager _tokenManager;
 
+    private readonly DbInterface _dbInterface;
+
     // <summary>
     /// Initializes a new instance of the PlayerManager class.
     /// </summary>
@@ -17,6 +19,7 @@ public class PlayerManager
         _players = dbInterface.GetCollection<Player>("Players");
         _logManager = logManager;
         _tokenManager = tokenManager;
+        _dbInterface = dbInterface;
     }
 
     /// <summary>
@@ -24,16 +27,22 @@ public class PlayerManager
     /// </summary>
     /// <param name="playerId">The unique identifier for the player.</param>
     /// <returns>The player object if found; otherwise, null.</returns>
-    public async Task<Player> GetPlayerById(string playerId)
+    public async Task<Player> GetPlayerById(int playerId)
     {
         return await _players.Find(p => p.PlayerID == playerId).FirstOrDefaultAsync();
     }
 
-    public async Task<string> GetPlayerIdByUsername(string username)
+    public async Task<int> GetPlayerIdByUsername(string username)
     {
         var player = await _players.Find(p => p.Username == username).FirstOrDefaultAsync();
-        return player.PlayerID ?? throw new NullReferenceException("Player ID is null.");
+        if (player == null)
+        {
+            throw new NullReferenceException("Player not found.");
+        }
+
+        return Convert.ToInt32(player.PlayerID);
     }
+
 
     /// <summary>
     /// Checks if a username is available.
@@ -56,6 +65,7 @@ public class PlayerManager
     {
         var player = new Player
         {
+            PlayerID = await GetNextPlayerIdAsync(),
             Username = username,
             PasswordHash = HashPassword(password),
             RegistrationDate = DateTime.UtcNow, 
@@ -116,7 +126,7 @@ public class PlayerManager
         return _tokenManager.GenerateToken(player);
     }
 
-    public async Task InvalidateToken(string playerId)
+    public async Task InvalidateToken(int playerId)
     {
         try
         {
@@ -131,28 +141,61 @@ public class PlayerManager
     }
 
 
-    public async Task<List<Player>> GetPlayersByIdsAsync(List<string> playerIds)
+    public async Task<List<Player>> GetPlayersByIdsAsync(List<int> playerIds)
     {
         var filter = Builders<Player>.Filter.In(p => p.PlayerID, playerIds);
         return await _players.Find(filter).ToListAsync();
     }
 
-    public async Task<Player> GetPlayer(string playerID)
+    public async Task<Player> GetPlayer(int playerID)
     {
         return await _players.Find(p => p.PlayerID == playerID).FirstOrDefaultAsync();
     }
 
-    public async Task<string?> PlayerValidateToken(string token)
+    public async Task<int?> PlayerValidateToken(string token)
     {
         try
         {
-            return await Task.FromResult(_tokenManager.ValidateToken(token));
+            var playerId = _tokenManager.ValidateToken(token);
+            if (playerId == null || playerId == 0)
+            {
+                // Geçersiz token durumu
+                return null;
+            }
+
+            // Geçerli bir playerId varsa, döndür
+            return playerId;
         }
         catch (Exception ex)
         {
-            // Log the exception or handle it as needed
             Console.WriteLine($"Error validating token: {ex.Message}");
             return null;
         }
+    }
+
+    public async Task InitializeCounterAsync()
+    {
+        Console.WriteLine("Initializing counters...");
+        var counterCollection = _dbInterface.GetCollection<Counter>("Counters");
+        var playerCounter = await counterCollection.Find(c => c.Id == "playerId").FirstOrDefaultAsync();
+        if (playerCounter == null)
+        {
+            await counterCollection.InsertOneAsync(new Counter { Id = "playerId", SeqValue = 0 });
+        }
+    }
+
+    public async Task<int> GetNextPlayerIdAsync()
+    {
+        var filter = Builders<Counter>.Filter.Eq(c => c.Id, "playerId");
+        var update = Builders<Counter>.Update.Inc(c => c.SeqValue, 1);
+        var options = new FindOneAndUpdateOptions<Counter, Counter>
+        {
+            ReturnDocument = ReturnDocument.After
+        };
+
+        var counterCollection = _dbInterface.GetCollection<Counter>("Counters");
+        var updatedCounter = await counterCollection.FindOneAndUpdateAsync(filter, update, options);
+
+        return updatedCounter.SeqValue;
     }
 }
