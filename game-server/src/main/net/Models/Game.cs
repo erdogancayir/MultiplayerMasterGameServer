@@ -1,8 +1,19 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System;
+
 public class Game
 {
-    public string GameId { get; set; }
-    public string State { get; set; }
-    // Other game-related properties
+    public string? GameID { get; set; }
 
-    // Constructors and methods as needed
+    public string? LobbyID { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public GameStatus Status { get; set; }
+
+    public enum GameStatus
+    {
+        InProgress,
+        Completed
+    }
 }

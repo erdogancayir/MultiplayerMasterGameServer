@@ -9,6 +9,7 @@ public class SocketListener
     private readonly TcpListener _listener;
     private readonly IServiceProvider _serviceProvider;
     private readonly ConnectionManager _connectionManager;
+    private readonly HeartbeatManager _heartbeatManager;
     private Dictionary<OperationType, Action<NetworkStream ,byte[], int>>? operationHandlers;
     private Random _random = new Random();
     
@@ -24,6 +25,7 @@ public class SocketListener
         _listener = new TcpListener(IPAddress.Any, _port);
         _connectionManager = _serviceProvider.GetService<ConnectionManager>()
                      ?? throw new InvalidOperationException("ConnectionManager not available.");
+        _heartbeatManager = _serviceProvider.GetService<HeartbeatManager>() ?? throw new InvalidOperationException("HeartbeatManager not available.");
         InitializeOperationHandlers();
     }
 
@@ -75,6 +77,7 @@ public class SocketListener
             _listener.Start();
             Console.WriteLine($"Listening for connections on port {_port}...");
             BeginAcceptClient();
+            _heartbeatManager.StartSendingHeartbeats();
         }
         catch (Exception ex)
         {

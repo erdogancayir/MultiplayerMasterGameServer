@@ -23,7 +23,8 @@ namespace GameServer
                 // Start the socket listener
                 var socketListener = new SocketListener(serverConfig.SocketTcpListenerPort, serverConfig.SocketUdpListenerPort, serviceProvider);
                 socketListener.Start();
-
+                // Keep the server running
+                KeepServerRunning();
             }
             catch (System.Exception e)
             {
@@ -50,6 +51,18 @@ namespace GameServer
             services.AddSingleton<PositionManager>();
             services.AddSingleton<TcpConnectionManager>();
             services.AddSingleton<UdpConnectionManager>();
+        }
+
+        /// <summary>
+        /// Keeps the server running, handling logic for a graceful shutdown.
+        /// </summary>
+        private static void KeepServerRunning()
+        {
+            // Logic to keep the server running, handle graceful shutdown, etc.
+            while (true)
+            {
+                // Server logic or waiting for termination signal
+            }
         }
     }
 }

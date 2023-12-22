@@ -93,6 +93,27 @@ namespace MasterServer
                 new GameStatisticsManager(provider.GetRequiredService<DbInterface>()));
             services.AddSingleton<LeaderboardManager>(provider =>
                 new LeaderboardManager(provider.GetRequiredService<DbInterface>()));
+            services.AddSingleton<HeartbeatManager>(provider =>
+            {
+                var dbInterface = provider.GetRequiredService<DbInterface>();
+                // Örnek GameServer listesi oluşturma
+                var gameServers = new List<GameServer>
+                {
+                    new GameServer
+                    {
+                        ServerID = "1",
+                        IP = "127.0.0.1",
+                        Port = 8081,
+                        Status = "Active",
+                        LastHeartbeatTime = DateTime.UtcNow.ToString(),
+                        Region = "EU",
+                        CreationTime = DateTime.UtcNow
+                    },
+                    // Diğer GameServer nesneleri...
+                };
+        
+                return new HeartbeatManager(dbInterface, gameServers);
+            });
         }
         #endregion
 

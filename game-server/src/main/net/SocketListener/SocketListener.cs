@@ -20,8 +20,9 @@ public class SocketListener
         _tcpPort = tcpPort;
         _udpPort = udpPort;
         _serviceProvider = serviceProvider;
-        _tcpConnectionManager = _serviceProvider.GetRequiredService<TcpConnectionManager>();
+        _udpConnectionHandler = new UdpConnectionHandler(_udpPort, _udpOperationHandlers, _serviceProvider.GetRequiredService<PositionManager>());
         InitializeUdpOperationHandlers();
+        _tcpConnectionManager = _serviceProvider.GetRequiredService<TcpConnectionManager>();
         InitializeTcpOperationHandlers();
     }
 
@@ -32,13 +33,11 @@ public class SocketListener
 
     private void InitializeUdpOperationHandlers()
     {
+        
         _udpOperationHandlers = new Dictionary<OperationType, Action<IPEndPoint, byte[]>>
         {
             { OperationType.PlayerPositionUpdate, _udpConnectionHandler.HandlePlayerPositionUpdate }
         };
-        var udpConnectionHandlerLogger = _serviceProvider.GetRequiredService<ILogger<UdpConnectionHandler>>();
-        var positionManager = _serviceProvider.GetRequiredService<PositionManager>();
-        _udpConnectionHandler = new UdpConnectionHandler(_udpPort, _udpOperationHandlers, udpConnectionHandlerLogger, positionManager);
     }
 
     public void Start()

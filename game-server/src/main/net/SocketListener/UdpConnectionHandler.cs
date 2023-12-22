@@ -11,19 +11,16 @@ public class UdpConnectionHandler
     private UdpClient _udpClient;
     private readonly int _udpPort;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
-    private readonly ILogger<UdpConnectionHandler> _logger;
     private readonly PositionManager _positionManager;
 
     public UdpConnectionHandler(int udpPort, 
                                 Dictionary<OperationType, Action<IPEndPoint, byte[]>>? udpOperationHandlers, 
-                                ILogger<UdpConnectionHandler> logger,
                                 PositionManager positionManager)
     {
         _udpPort = udpPort;
         _udpClient = new UdpClient(_udpPort);
         _udpOperationHandlers = udpOperationHandlers;
         _positionManager = positionManager;
-        _logger = logger;
     }
 
     public void StartListening()
@@ -31,11 +28,11 @@ public class UdpConnectionHandler
         try
         {
             BeginReceiveUdp();
-            _logger.LogInformation($"UDP Listener started on port {_udpPort}.");
+            Console.WriteLine($"UDP Listener started on port {_udpPort}.");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error starting UDP listener: {ex}");
+            Console.WriteLine($"Error starting UDP listener: {ex}");
         }
     }
 
@@ -60,8 +57,8 @@ public class UdpConnectionHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error receiving UDP packet: {ex}");
-            BeginReceiveUdp(); // Yeniden dinlemeye başla
+            Console.WriteLine($"Error receiving UDP packet: {ex}");
+            BeginReceiveUdp();
         }
     }
 
@@ -72,7 +69,7 @@ public class UdpConnectionHandler
             var basePack = MessagePackSerializer.Deserialize<BasePack>(receivedBytes);
             if (!Enum.IsDefined(typeof(OperationType), basePack.OperationTypeId))
             {
-                _logger.LogWarning($"Invalid OperationType received: {basePack.OperationTypeId}");
+                Console.WriteLine($"Invalid OperationType received: {basePack.OperationTypeId}");
                 return;
             }
 
@@ -82,12 +79,12 @@ public class UdpConnectionHandler
             }
             else
             {
-                _logger.LogWarning($"No handler found for operation type: {basePack.OperationTypeId}");
+                Console.WriteLine($"No handler found for operation type: {basePack.OperationTypeId}");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error parsing UDP data: {ex}");
+            Console.WriteLine($"Error parsing UDP data: {ex}");
         }
     }
 
@@ -103,7 +100,7 @@ public class UdpConnectionHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error handling player position update: {ex}");
+            Console.WriteLine($"Error handling player position update: {ex}");
         }
     }
 
@@ -147,7 +144,7 @@ public class UdpConnectionHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error in AddOrUpdatePlayer: {ex}");
+            Console.WriteLine($"Error in AddOrUpdatePlayer: {ex}");
         }
     }
 }

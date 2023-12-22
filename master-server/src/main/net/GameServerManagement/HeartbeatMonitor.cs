@@ -1,46 +1,51 @@
-public class HeartbeatMonitor
+using System.Net.Sockets;
+
+public class HeartbeatManager
 {
     private readonly List<GameServer> _gameServers;
     private Timer _timer;
-    private readonly TimeSpan _heartbeatTimeout = TimeSpan.FromMinutes(5);
+    private readonly TimeSpan _heartbeatInterval = TimeSpan.FromMinutes(1);
+    private readonly DbInterface _dbInterface;
 
-    public HeartbeatMonitor(List<GameServer> gameServers)
+    public HeartbeatManager(DbInterface dbInterface, List<GameServer> gameServers)
     {
+        _dbInterface = dbInterface;
         _gameServers = gameServers;
+        // Timer ve diğer başlangıç işlemleri...
     }
 
-    public void StartMonitoring()
+    public void StartSendingHeartbeats()
     {
-        _timer = new Timer(CheckServerStatus, null, TimeSpan.Zero, TimeSpan.FromMinutes(1)); // Her 1 dakikada bir kontrol
+        _timer = new Timer(SendHeartbeatToAllServers, null, TimeSpan.Zero, _heartbeatInterval);
     }
 
-    private void CheckServerStatus(object state)
+    private void SendHeartbeatToAllServers(object state)
     {
         foreach (var server in _gameServers)
         {
-            if (!IsServerAlive(server))
+            SendHeartbeat(server);
+            Console.WriteLine($"Heartbeat sent to server {server.ServerID}");
+        }
+    }
+
+    private void SendHeartbeat(GameServer server)
+    {
+        try
+        {
+            using (var client = new TcpClient(server.IP, server.Port))
             {
-                HandleServerFailure(server);
+                var buffer = System.Text.Encoding.ASCII.GetBytes("heartbeat");
+                client.GetStream().Write(buffer, 0, buffer.Length);
             }
         }
-    }
-
-    private bool IsServerAlive(GameServer server)
-    {
-        if (DateTime.TryParse(server.LastHeartbeatTime, out var lastHeartbeat))
+        catch (Exception ex)
         {
-            return DateTime.UtcNow - lastHeartbeat < _heartbeatTimeout;
+            // Sunucuyla iletişim kurulamadığında yapılacak işlemler
+            Console.WriteLine($"Server {server.ServerID} is not responding: {ex.Message}");
         }
-        return false;
     }
 
-    private void HandleServerFailure(GameServer server)
-    {
-        server.Status = "Offline";
-        // Sunucu başarısız olduğunda yapılacak işlemler...
-    }
-
-    public void StopMonitoring()
+    public void StopSendingHeartbeats()
     {
         _timer?.Dispose();
     }

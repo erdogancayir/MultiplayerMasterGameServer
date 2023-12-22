@@ -26,8 +26,8 @@ public class LoadServerConfiguration
     {
         return new ServerConfig
         {
-            SocketTcpListenerPort = 8080,
-            SocketUdpListenerPort = 8081,
+            SocketTcpListenerPort = 8081,
+            SocketUdpListenerPort = 8082,
             JwtSecretKey = "secret-key"
         };
     }
