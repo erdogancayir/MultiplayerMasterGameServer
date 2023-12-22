@@ -48,10 +48,10 @@ public class SocketListener
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
-            { OperationType.CreateGame,  gameManager.HandleCreateGameRequest},
-            { OperationType.GetGame,  gameManager.HandleGetGameRequest},
+            { OperationType.CreateGame, gameManager.HandleCreateGameRequest},
+            { OperationType.GetGame, gameManager.HandleGetGameRequest},
             { OperationType.GetGameStatistics, gameStatisticsManager.HandleGetGameStatisticsRequest},
-            { OperationType.GetTopLeaderboardEntries,  leaderboardManager.HandleGetTopLeaderboardEntriesRequest},
+            { OperationType.GetTopLeaderboardEntries, leaderboardManager.HandleGetTopLeaderboardEntriesRequest},
         };
     }
 

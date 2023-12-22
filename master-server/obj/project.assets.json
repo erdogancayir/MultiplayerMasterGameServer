@@ -1719,11 +1719,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Desktop/sonhal/master-server/master-server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Desktop/hasan_test/master-server/master-server.csproj",
       "projectName": "master-server",
-      "projectPath": "/home/erdogancayir/Desktop/sonhal/master-server/master-server.csproj",
+      "projectPath": "/home/erdogancayir/Desktop/hasan_test/master-server/master-server.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Desktop/sonhal/master-server/obj/",
+      "outputPath": "/home/erdogancayir/Desktop/hasan_test/master-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
@@ -1815,7 +1815,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/erdogancayir/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

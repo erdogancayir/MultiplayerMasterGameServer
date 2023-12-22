@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UwGOmrrM0Df0RbZskM9ftxM0CVIjQ9G/C2uLvINbcPDTzT2lvWicfXzO2t+nvbhd9bZnFAMhnNbg7n4VJie52w==",
+  "dgSpecHash": "kBEtbtZHJJxtPHNsltTem6etdaeN0sT4P98/Xuc2NCL1B6G/B/K/q/g/fR4Wtn6ipBlL5dchwRDBKu4XR2+BNA==",
   "success": true,
-  "projectFilePath": "/home/erdogancayir/Desktop/sonhal/test-master-server/test/test.csproj",
+  "projectFilePath": "/home/erdogancayir/Desktop/hasan_test/test-master-server/test/test.csproj",
   "expectedPackageFiles": [
     "/home/erdogancayir/.nuget/packages/messagepack/2.5.140/messagepack.2.5.140.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/messagepack.annotations/2.5.140/messagepack.annotations.2.5.140.nupkg.sha512",

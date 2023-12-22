@@ -1,14 +1,14 @@
 public class HeartbeatMonitor
 {
-    private readonly GameServerManager _gameServerManager;
+    private readonly List<GameServer> _gameServers;
     private Timer _timer;
+    private readonly TimeSpan _heartbeatTimeout = TimeSpan.FromMinutes(5);
 
-    public HeartbeatMonitor(GameServerManager gameServerManager)
+    public HeartbeatMonitor(List<GameServer> gameServers)
     {
-        _gameServerManager = gameServerManager;
+        _gameServers = gameServers;
     }
 
-    // Heartbeat kontrolünü başlat
     public void StartMonitoring()
     {
         _timer = new Timer(CheckServerStatus, null, TimeSpan.Zero, TimeSpan.FromMinutes(1)); // Her 1 dakikada bir kontrol
@@ -16,31 +16,30 @@ public class HeartbeatMonitor
 
     private void CheckServerStatus(object state)
     {
-        /* foreach (var server in _gameServerManager.GameServers)
+        foreach (var server in _gameServers)
         {
-            // Sunucunun durumunu kontrol et (örneğin, ping gönder)
-            bool isAlive = CheckIfServerIsAlive(server);
-            if (!isAlive)
+            if (!IsServerAlive(server))
             {
                 HandleServerFailure(server);
             }
-        } */
+        }
     }
 
-    private bool CheckIfServerIsAlive(GameServer server)
+    private bool IsServerAlive(GameServer server)
     {
-        // Sunucuya ping gönderip yanıtını kontrol edin
-        // Basit bir örnek olarak, her zaman true döndürün
-        return true;
+        if (DateTime.TryParse(server.LastHeartbeatTime, out var lastHeartbeat))
+        {
+            return DateTime.UtcNow - lastHeartbeat < _heartbeatTimeout;
+        }
+        return false;
     }
 
     private void HandleServerFailure(GameServer server)
     {
-        // Sunucu başarısız olduğunda yapılacak işlemler
-        // Örneğin, sunucuyu yeniden başlatma, loglama, uyarı gönderme
+        server.Status = "Offline";
+        // Sunucu başarısız olduğunda yapılacak işlemler...
     }
 
-    // Heartbeat kontrolünü durdur
     public void StopMonitoring()
     {
         _timer?.Dispose();

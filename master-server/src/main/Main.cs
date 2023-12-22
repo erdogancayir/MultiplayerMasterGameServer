@@ -26,9 +26,8 @@ namespace MasterServer
 
                 var serverConfig = serviceProvider.GetService<ServerConfig>();
                 if (serverConfig == null)
-                {
                     throw new InvalidOperationException("Server configuration could not be loaded.");
-                }
+
                 // Initialize and start the socket listener
                 var socketListener = new SocketListener(serverConfig.SocketListenerPort, serviceProvider);
                 socketListener.Start();

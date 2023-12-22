@@ -1,10 +1,10 @@
 public class GameServerManager
 {
-    private List<GameServer> _gameServers; // Oyun sunucularınızın listesi
+    public List<GameServer> gameServers; // Oyun sunucularınızın listesi
 
     public GameServerManager()
     {
-        _gameServers = new List<GameServer>();
+        gameServers = new List<GameServer>();
         // Burada, mevcut oyun sunucularınızı yükleyin veya yapılandırın
     }
 
@@ -14,13 +14,13 @@ public class GameServerManager
         // Burada, oyuncuyu uygun bir oyun sunucusuna atayacak algoritmanızı uygulayın
         // Örnek: Yük dengesi, oyun türüne göre seçim vb.
         // Şimdilik basit bir örnek:
-        return _gameServers.FirstOrDefault(); // İlk sunucuyu döndür
+        return gameServers.FirstOrDefault(); // İlk sunucuyu döndür
     }
 
     // Sunucu listesini güncelleme
     public void UpdateGameServers(List<GameServer> servers)
     {
-        _gameServers = servers;
+        gameServers = servers;
     }
 
     // Diğer yönetim işlevleri...

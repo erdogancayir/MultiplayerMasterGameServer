@@ -1,3 +1,4 @@
+using Amazon.Runtime.Internal;
 using dotenv.net;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -52,3 +53,4 @@ namespace GameServer
         }
     }
 }
+

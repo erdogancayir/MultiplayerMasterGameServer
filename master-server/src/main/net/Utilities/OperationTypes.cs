@@ -41,8 +41,4 @@ public enum OperationType
     // Heartbeat and Monitoring
     HeartbeatPing = 500,
     HeartbeatResponse = 501,
-
-    // Multi-Server Operations
-    ServerTransferRequest = 600,
-    ServerTransferResponse = 601,
 }
