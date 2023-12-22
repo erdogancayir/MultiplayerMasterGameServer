@@ -112,14 +112,15 @@ public class UdpConnectionHandler
         }
     }
 
-    private void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
+    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
     {
         var data = MessagePackSerializer.Serialize(playerPositionUpdate);
 
         if (_positionManager.TryGetPlayerData(playerId, out PlayerData playerData))
         {
             // Broadcast the position update to all players in the same lobby
-            _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data);
+            if (playerData.LobbyId != null)
+                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data);
         }
     }
 
