@@ -18,6 +18,6 @@ public class Counter
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
     public int SeqValue { get; set; }
 }

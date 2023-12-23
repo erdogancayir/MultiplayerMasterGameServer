@@ -38,7 +38,7 @@ public class Matchmaker
             var joinLobbyRequest = MessagePackSerializer.Deserialize<MatchmakingRequest>(data);
             var playerId = _tokenManager.ValidateToken(joinLobbyRequest.Token);
 
-            if (playerId == null || playerId == 0) // playerId'nin geçerliliğini kontrol edin
+            if (playerId == null || playerId == 0)
             {
                 Console.WriteLine("Invalid token.");
                 await SendErrorResponse(stream, "Invalid token.");
@@ -46,7 +46,7 @@ public class Matchmaker
             }
 
             var allLobbies = await lobbyManager.GetLobbies();
-            var lobby = FindOrCreateLobby(allLobbies, playerId.Value); // Nullable int'in değerini kullanın
+            var lobby = FindOrCreateLobby(allLobbies, playerId.Value);
             await lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
             await UpdateLobbyStatus(lobby);
             await SendJoinLobbyResponse(stream, lobby);
@@ -71,7 +71,6 @@ public class Matchmaker
             var createLobbyRequest = MessagePackSerializer.Deserialize<CreateLobbyRequest>(data);
             var playerId = _tokenManager.ValidateToken(createLobbyRequest.Token);
 
-            // playerId'nin geçerli bir değer olup olmadığını kontrol edin
             if (playerId == null || playerId == 0)
             {
                 Console.WriteLine("Invalid token.");
@@ -81,7 +80,6 @@ public class Matchmaker
 
             var newLobby = new Lobby
             {
-                // Null olmadığından emin olduktan sonra playerId'nin değerini kullanın
                 Players = new List<int> { playerId.Value },
                 Status = Lobby.LobbyStatus.Waiting,
                 CreationTime = DateTime.UtcNow,
@@ -220,7 +218,6 @@ public class Matchmaker
         };
         var responseData = MessagePackSerializer.Serialize(response);
         await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
     }
 
     private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby)
@@ -235,7 +232,6 @@ public class Matchmaker
         };
         var responseData = MessagePackSerializer.Serialize(response);
         await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
     }
 
     private async Task SendErrorResponse(NetworkStream stream, string message)
@@ -248,7 +244,6 @@ public class Matchmaker
         };
         var responseData = MessagePackSerializer.Serialize(response);
         await stream.WriteAsync(responseData, 0, responseData.Length);
-        //await SendMessage(stream, response);
     }
 
     /// <summary>

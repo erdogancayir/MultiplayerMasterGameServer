@@ -12,13 +12,20 @@ public class LeaderboardManager
 
     public async void HandleGetTopLeaderboardEntriesRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
+        
     }
 
+    /// <summary>
+    /// Updates or inserts a leaderboard entry asynchronously.
+    /// </summary>
+    /// <param name="entry"></param>
+    /// <returns></returns>
     public async Task UpdateOrInsertLeaderboardEntryAsync(LeaderboardEntry entry)
     {
         var filter = Builders<LeaderboardEntry>.Filter.Eq(le => le.PlayerID, entry.PlayerID);
+
         var update = Builders<LeaderboardEntry>.Update
-            .Set(le => le.TotalPoints, entry.TotalPoints)
+            .Inc(le => le.TotalPoints, entry.TotalPoints)
             .SetOnInsert(le => le.PlayerID, entry.PlayerID);
 
         var options = new UpdateOptions { IsUpsert = true };

@@ -27,5 +27,4 @@ public class CreateLobbyResponse : BasePack
 
     [Key(5)]
     public string? ErrorMessage { get; set; }
-
 }

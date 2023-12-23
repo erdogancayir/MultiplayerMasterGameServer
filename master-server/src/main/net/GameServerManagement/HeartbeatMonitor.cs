@@ -4,7 +4,7 @@ using MessagePack;
 public class HeartbeatManager
 {
     private readonly List<GameServer> _gameServers;
-    private Timer _timer;
+    private Timer? _timer;
     private readonly TimeSpan _heartbeatInterval = TimeSpan.FromMinutes(1);
     private readonly DbInterface _dbInterface;
 
@@ -14,11 +14,18 @@ public class HeartbeatManager
         _gameServers = gameServers;
     }
 
+    /// <summary>
+    /// Starts sending heartbeats to all game servers.
+    /// </summary>
     public void StartSendingHeartbeats()
     {
         _timer = new Timer(SendHeartbeatToAllServers, null, TimeSpan.Zero, _heartbeatInterval);
     }
 
+    /// <summary>
+    /// Sends a heartbeat to all game servers.
+    /// </summary>
+    /// <param name="state"></param>
     private void SendHeartbeatToAllServers(object state)
     {
         foreach (var server in _gameServers)

@@ -7,10 +7,10 @@ public class Matchmaking
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string MatchID { get; set; }
+    public string? MatchID { get; set; }
 
-    public List<int> Players { get; set; } // List of PlayerIDs
-    public string LobbyID { get; set; }
+    public List<int>? Players { get; set; } // List of PlayerIDs
+    public string? LobbyID { get; set; }
     public DateTime StartTime { get; set; }
-    public string Status { get; set; }
+    public string? Status { get; set; }
 }

@@ -9,7 +9,9 @@ public class ClientConnectionHandler
     private ConnectionManager _connectionManager;
     private int _connectionId;
 
-    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers, ConnectionManager connectionManager, int connectionId)    {
+    public ClientConnectionHandler(TcpClient client, Dictionary<OperationType, Action<NetworkStream, byte[], int>>? operationHandlers,
+                                    ConnectionManager connectionManager, int connectionId)
+    {
         _client = client;
         _stream = client.GetStream();
         _operationHandlers = operationHandlers;

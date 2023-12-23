@@ -115,7 +115,12 @@ public class AuthService
         }
     }
 
-
+    /// <summary>
+    /// Handles the logout request by deserializing the data and invalidating the player's token.
+    /// </summary>
+    /// <param name="clientStream"></param>
+    /// <param name="data"></param>
+    /// <param name="connectionId"></param>
     public async void HandleLogoutRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
         try
@@ -127,7 +132,7 @@ public class AuthService
                 OperationTypeId = (int)OperationType.LogoutResponse
             };
 
-            var playerId = await _playerManager.PlayerValidateToken(logoutRequest.Token ?? "");
+            var playerId = _playerManager.PlayerValidateToken(logoutRequest.Token ?? "");
 
             if (playerId.HasValue && playerId != 0)
             {

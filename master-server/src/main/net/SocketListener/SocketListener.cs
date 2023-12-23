@@ -39,7 +39,6 @@ public class SocketListener
         var lobbyManager = GetService<LobbyManager>("LobbyManager");
         var matchmaker = GetService<Matchmaker>("Matchmaker");
         var gameManager = GetService<GameManager>("GameManager");
-        var gameStatisticsManager = GetService<GameStatisticsManager>("GameStatisticsManager");
         var leaderboardManager = GetService<LeaderboardManager>("LeaderboardManager");
 
         // Mapping each operation type to its corresponding handler.
@@ -51,9 +50,8 @@ public class SocketListener
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
             { OperationType.GameEndData, gameManager.HandleCreateGameRequest},
-
+            // to do
             { OperationType.GetGame, gameManager.HandleGetGameRequest},
-            { OperationType.GetGameStatistics, gameStatisticsManager.HandleGetGameStatisticsRequest},
             { OperationType.GetTopLeaderboardEntries, leaderboardManager.HandleGetTopLeaderboardEntriesRequest},
         };
     }

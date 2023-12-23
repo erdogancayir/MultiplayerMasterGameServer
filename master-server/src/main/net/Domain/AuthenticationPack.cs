@@ -26,14 +26,12 @@ public class AuthenticationResponse : BasePack
     public string Message { get; set; }  = "Operation not completed";
 }
 
-
 [MessagePackObject]
 public class LogoutRequest : BasePack
 {
     [Key(1)]
     public string? Token { get; set; }
 }
-
 
 [MessagePackObject]
 public class LogoutResponse : BasePack

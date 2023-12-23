@@ -152,7 +152,7 @@ public class PlayerManager
         return await _players.Find(p => p.PlayerID == playerID).FirstOrDefaultAsync();
     }
 
-    public async Task<int?> PlayerValidateToken(string token)
+    public int? PlayerValidateToken(string token)
     {
         try
         {
