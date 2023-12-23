@@ -11,10 +11,8 @@ public class TcpConnectionHandler
     private int _connectionId;
     private readonly PositionManager _positionManager;
 
-
     public TcpConnectionHandler(TcpClient client, TcpConnectionManager connectionManager, int connectionId, PositionManager positionManager) {
         _client = client;
-        //using var networkStream = client.GetStream();
         _stream = client.GetStream();
         _tcpConnectionManager = connectionManager;
         _connectionId = connectionId;
@@ -26,8 +24,8 @@ public class TcpConnectionHandler
     {
         _operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
         {
-            { OperationType.PlayerLobbyInfo, PlayerLobbyInfo },
-            { OperationType.HeartbeatPing, HeartbeatPing }
+            { OperationType.PlayerLobbyInfo, PlayerLobbyInfo }, // New: PlayerLobbyInfo
+            { OperationType.HeartbeatPing, HeartbeatPing } // New: HeartbeatPing
         };
     }
 
@@ -39,6 +37,7 @@ public class TcpConnectionHandler
         try
         {
             var heartbeatMessage = MessagePackSerializer.Deserialize<HeartbeatMessage>(data);
+            // Update the connection master server with the stream
             Console.WriteLine($"Heartbeat received from server {heartbeatMessage.ServerID} at {heartbeatMessage.Timestamp}.");
         }
         catch (Exception ex)
@@ -80,7 +79,6 @@ public class TcpConnectionHandler
     /// <param name="client">The client that has connected to the server.</param>
     public void HandleNewConnection()
     {
-        Console.WriteLine($"Client connected: {_client.Client.RemoteEndPoint}");
         byte[] buffer = new byte[1024];
         try
         {

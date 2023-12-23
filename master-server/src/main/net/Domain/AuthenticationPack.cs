@@ -30,7 +30,6 @@ public class AuthenticationResponse : BasePack
 [MessagePackObject]
 public class LogoutRequest : BasePack
 {
-
     [Key(1)]
     public string? Token { get; set; }
 }

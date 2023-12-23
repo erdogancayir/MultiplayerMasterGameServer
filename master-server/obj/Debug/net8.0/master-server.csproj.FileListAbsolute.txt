@@ -168,3 +168,4 @@
 /home/erdogancayir/Desktop/ops/master-server/obj/Debug/net8.0/master-server.pdb
 /home/erdogancayir/Desktop/ops/master-server/obj/Debug/net8.0/master-server.genruntimeconfig.cache
 /home/erdogancayir/Desktop/ops/master-server/obj/Debug/net8.0/ref/master-server.dll
+/home/erdogancayir/Desktop/ops/master-server/bin/Debug/net8.0/src/main/config/gameServerConfig.json

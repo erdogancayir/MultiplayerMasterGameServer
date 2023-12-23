@@ -8,4 +8,5 @@ public enum OperationType
     // Heartbeat and Monitoring
     HeartbeatPing = 500,
     HeartbeatResponse = 501,
+    GameEndData = 1000, // TCP This operation is sent by the server to the client to notify the client that the game has ended.
 }

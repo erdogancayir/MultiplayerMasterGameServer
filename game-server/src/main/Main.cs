@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Amazon.Runtime.Internal;
 using dotenv.net;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +48,11 @@ namespace GameServer
             var dbName = configLoader.DbConfig.DatabaseName;
             // Register DbInterface with necessary parameters
             services.AddSingleton<DbInterface>(provider => new DbInterface(dbConnectionString, dbName));
-            // Register TcpConnectionManager
+            services.AddSingleton<ConnectionMasterServer>(provider =>
+            {
+                var tcpClient = new TcpClient(configLoader.ServerConfig.MasterServerIp, configLoader.ServerConfig.MasterServerTcpPort);
+                return new ConnectionMasterServer(tcpClient);
+            });
             services.AddSingleton<PositionManager>();
             services.AddSingleton<TcpConnectionManager>();
             services.AddSingleton<UdpConnectionManager>();

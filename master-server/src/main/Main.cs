@@ -96,22 +96,7 @@ namespace MasterServer
             services.AddSingleton<HeartbeatManager>(provider =>
             {
                 var dbInterface = provider.GetRequiredService<DbInterface>();
-                // Örnek GameServer listesi oluşturma
-                var gameServers = new List<GameServer>
-                {
-                    new GameServer
-                    {
-                        ServerID = "1",
-                        IP = "127.0.0.1",
-                        Port = 8081,
-                        Status = "Active",
-                        LastHeartbeatTime = DateTime.UtcNow.ToString(),
-                        Region = "EU",
-                        CreationTime = DateTime.UtcNow
-                    },
-                    // Diğer GameServer nesneleri...
-                };
-        
+                var gameServers = configLoader.GameServerManager.GameServers;
                 return new HeartbeatManager(dbInterface, gameServers);
             });
         }

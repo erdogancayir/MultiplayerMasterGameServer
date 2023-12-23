@@ -2,9 +2,9 @@ using System.Net.Sockets;
 
 public class PositionManager
 {
-    private Dictionary<int, PlayerData> _playerData;
-    private Dictionary<string, List<int>> _lobbyPlayers; // int : Lobby id New: PlayerIds -> List of PlayerIds
-    private UdpClient _udpClient;
+    private Dictionary<int, PlayerData> _playerData; // int : PlayerId New: PlayerData -> PlayerId to PlayerData
+    private Dictionary<string, List<int>> _lobbyPlayers; // string : Lobby id New: PlayerIds -> List of PlayerIds
+    private UdpClient _udpClient; // New: UdpClient
 
     public PositionManager()
     {
@@ -60,11 +60,17 @@ public class PositionManager
         }
     }
 
+    /// <summary>
+    /// Returns the player data for the given player id.
+    /// </summary>
     public bool TryGetPlayerData(int playerId, out PlayerData data)
     {
         return _playerData.TryGetValue(playerId, out data);
     }
 
+    /// <summary>
+    /// Removes the player from the position manager.
+    /// </summary>
     public void RemovePlayer(int playerId)
     {
         if (_playerData.TryGetValue(playerId, out PlayerData? data))
@@ -75,5 +81,29 @@ public class PositionManager
             }
             _playerData.Remove(playerId);
         }
+    }
+
+    /// <summary>
+    /// Returns all players in the position manager that are in the same lobby as the given player.
+    /// </summary>
+    public List<int> GetPlayerIdsInLobby(string lobbyId)
+    {
+        if (_lobbyPlayers.TryGetValue(lobbyId, out List<int>? playerIds))
+        {
+            return playerIds;
+        }
+        return new List<int>();
+    }
+
+    /// <summary>
+    /// Returns the lobby id for the given player id.
+    /// </summary>
+    public string? GetPlayerLobbyId(int playerId)
+    {
+        if (_playerData.TryGetValue(playerId, out PlayerData? data))
+        {
+            return data.LobbyId;
+        }
+        return null;
     }
 }

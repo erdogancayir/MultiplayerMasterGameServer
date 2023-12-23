@@ -4,10 +4,7 @@ using System;
 
 public class Game
 {
-    public string? GameID { get; set; }
-
     public string? LobbyID { get; set; }
-    public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public GameStatus Status { get; set; }
 

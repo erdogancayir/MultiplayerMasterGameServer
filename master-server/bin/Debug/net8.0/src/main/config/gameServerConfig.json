@@ -1,0 +1,11 @@
+[
+    {
+        "ServerID": "1",
+        "IP": "127.0.0.1",
+        "Port": 8081,
+        "Status": "Active",
+        "LastHeartbeatTime": "2021-01-01T00:00:00Z",
+        "Region": "EU",
+        "CreationTime": "2021-01-01T00:00:00Z"
+    }
+]

@@ -19,16 +19,24 @@ public class SocketListener
         _tcpPort = tcpPort;
         _udpPort = udpPort;
         _serviceProvider = serviceProvider;
-        _udpConnectionHandler = new UdpConnectionHandler(_udpPort, _serviceProvider.GetRequiredService<PositionManager>());
+        _udpConnectionHandler = new UdpConnectionHandler(_udpPort,
+                                                        _serviceProvider.GetRequiredService<PositionManager>(),
+                                                        _serviceProvider.GetRequiredService<ConnectionMasterServer>());
         _tcpConnectionManager = _serviceProvider.GetRequiredService<TcpConnectionManager>();
     }
 
+    /// <summary>
+    /// Starts the TCP and UDP listeners.
+    /// </summary>
     public void Start()
     {
         StartTcpListener();
         _udpConnectionHandler.StartListening();
     }
 
+    /// <summary>
+    /// Starts the TCP listener.
+    /// </summary>
     private void StartTcpListener()
     {
         try
@@ -44,6 +52,10 @@ public class SocketListener
         }
     }
 
+    /// <summary>
+    /// Handles a new TCP client connection.
+    /// </summary>
+    /// <param name="ar"></param>
     private void TcpClientAccepted(IAsyncResult ar)
     {
         try

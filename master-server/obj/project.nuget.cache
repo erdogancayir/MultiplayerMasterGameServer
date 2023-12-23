@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "9XdKc76OvTq5IQbB2imC/qs4JrlVBebP3G30r2dlvdb0vEjv+pJ/f4flrDcvab6Teqf2E9yJMf7UcZ5hPUFnXg==",
+  "dgSpecHash": "ecPqcZ7rXyFWqxnXjM56DthMnZ0Ja8wW8XeRUHPzxv70riUc51f21O0g+4xdsrf0XFvVhYOmp2+fd9vr9d37jA==",
   "success": true,
   "projectFilePath": "/home/erdogancayir/Desktop/ops/master-server/master-server.csproj",
   "expectedPackageFiles": [
@@ -29,7 +29,7 @@
     "/home/erdogancayir/.nuget/packages/mongodb.driver.core/2.23.1/mongodb.driver.core.2.23.1.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/mongodb.libmongocrypt/1.8.0/mongodb.libmongocrypt.1.8.0.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/moq/4.20.70/moq.4.20.70.nupkg.sha512",
-    "/home/erdogancayir/.nuget/packages/newtonsoft.json/13.0.2/newtonsoft.json.13.0.2.nupkg.sha512",
+    "/home/erdogancayir/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/nunit/4.0.1/nunit.4.0.1.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/nunit3testadapter/4.5.0/nunit3testadapter.4.5.0.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/sharpcompress/0.30.1/sharpcompress.0.30.1.nupkg.sha512",

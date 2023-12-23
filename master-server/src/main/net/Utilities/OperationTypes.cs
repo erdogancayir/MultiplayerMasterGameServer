@@ -29,7 +29,8 @@ public enum OperationType
     CreateGame = 450,
     UpdateGame = 451,
     GetGame = 452,
-
+    GameEndData = 1000,
+    GameSaveResponsePack = 1001,
     // Game Statistics Operations
     CreateGameStatistics = 453,
     GetGameStatistics = 454,
@@ -40,5 +41,4 @@ public enum OperationType
 
     // Heartbeat and Monitoring
     HeartbeatPing = 500,
-    HeartbeatResponse = 501,
 }

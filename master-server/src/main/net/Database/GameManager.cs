@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using MessagePack;
 using MongoDB.Driver;
 
 public class GameManager
@@ -12,7 +13,35 @@ public class GameManager
 
     public async void HandleCreateGameRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
+        Console.WriteLine("CreateGameRequest received.");
+        try
+        {
+            var createGameRequest = MessagePackSerializer.Deserialize<GameSavePack>(data);
+            var response = new GameSaveResponsePack();
+            response.OperationTypeId = (int)OperationType.GameSaveResponsePack;
 
+            if (createGameRequest == null || createGameRequest.GameData == null)
+            {
+                Console.WriteLine("CreateGameRequest is null.");
+                return;
+            }
+            var game = new Game
+            {
+                LobbyID = createGameRequest.GameData.LobbyID,
+                EndTime = createGameRequest.GameData.EndTime,
+                Status = createGameRequest.GameData.Status,
+                PlayerID = createGameRequest.PlayerID
+            };
+            await CreateGameAsync(game);
+            response.Success = true;
+            var responseData = MessagePackSerializer.Serialize(response);
+            await clientStream.WriteAsync(responseData, 0, responseData.Length);
+            Console.WriteLine($"Game {game.GameID} created.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing CreateGameRequest: {ex.Message}");
+        }
     }
 
     public async void HandleGetGameRequest(NetworkStream clientStream, byte[] data, int connectionId)

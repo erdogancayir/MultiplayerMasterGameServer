@@ -1,12 +1,18 @@
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
+
 public class LoadServerConfiguration
 {
     public DatabaseConfig DbConfig { get; private set; }
     public ServerConfig ServerConfig { get; private set; }
 
+    public GameServerManager GameServerManager { get; private set; }
+
     public LoadServerConfiguration()
     {
         DbConfig = LoadDatabaseConfig();
         ServerConfig = LoadServerConfig();
+        GameServerManager = LoadGameServerConfig();
     }
 
     private DatabaseConfig LoadDatabaseConfig()
@@ -34,5 +40,13 @@ public class LoadServerConfiguration
             JwtSecretKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32))
             // ...other settings
         };
+    }
+
+    private GameServerManager LoadGameServerConfig()
+    {
+        string gameServerConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "src/main/config", "gameServerConfig.json");
+        string json = File.ReadAllText(gameServerConfigPath);
+        var gameServers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GameServer>>(json);
+        return new GameServerManager { GameServers = gameServers };
     }
 }

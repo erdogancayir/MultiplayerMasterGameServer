@@ -33,7 +33,6 @@ public class ClientConnectionHandler
     /// <param name="client">The client that has connected to the server.</param>
     public void HandleNewConnection()
     {
-        Console.WriteLine($"Client connected: {_client.Client.RemoteEndPoint}");
         byte[] buffer = new byte[1024];
         try
         {
