@@ -12,6 +12,7 @@ public enum OperationType
     JoinLobbyRequest = 200,
     JoinLobbyResponse = 201,
     LeaveLobbyRequest = 202,
+    LeavingLobbyResponse = 207,
     MatchmakingResponse = 203,
     CreateLobbyRequest = 204,
     CreateLobbyResponse = 205,

@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 public class Matchmaker
 {
-    private LobbyManager lobbyManager;
+    private LobbyManager _lobbyManager;
     private readonly TokenManager _tokenManager;
     private PlayerManager playerManager;
     private readonly ConnectionManager _connectionManager;
@@ -18,7 +18,7 @@ public class Matchmaker
     /// <param name="connectionManager">The connection manager to handle network connections.</param>
     public Matchmaker(LobbyManager lobbyManager, TokenManager tokenManager, PlayerManager playerManager, ConnectionManager connectionManager)
     {
-        this.lobbyManager = lobbyManager;
+        _lobbyManager = lobbyManager;
         _tokenManager = tokenManager;
         this.playerManager = playerManager;
         _connectionManager = connectionManager;
@@ -45,9 +45,9 @@ public class Matchmaker
                 return;
             }
 
-            var allLobbies = await lobbyManager.GetLobbies();
+            var allLobbies = await _lobbyManager.GetLobbies();
             var lobby = FindOrCreateLobby(allLobbies, playerId.Value);
-            await lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
+            await _lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
             await UpdateLobbyStatus(lobby);
             await SendJoinLobbyResponse(stream, lobby);
         }
@@ -85,7 +85,7 @@ public class Matchmaker
                 CreationTime = DateTime.UtcNow,
                 MaxPlayers = createLobbyRequest.MaxPlayers
             };
-            await lobbyManager.CreateLobby(newLobby);
+            await _lobbyManager.CreateLobby(newLobby);
             await SendCreateLobbyResponse(stream, newLobby);
         }
         catch (Exception ex)
@@ -115,10 +115,48 @@ public class Matchmaker
             Status = Lobby.LobbyStatus.Waiting,
             CreationTime = DateTime.UtcNow
         };
-        lobbyManager.CreateLobby(newLobby).Wait();
+        _lobbyManager.CreateLobby(newLobby).Wait();
         return newLobby;
     }
 
+    /// <summary>
+    /// Handles a request to leave a lobby.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="data"></param>
+    /// <param name="connectionId"></param>
+    public async void HandlePlayerLeavingLobby(NetworkStream stream, byte[] data, int connectionId)
+    {
+        Console.WriteLine("Player leaving lobby request received.");
+        var playerLeavingLobbyRequest = MessagePackSerializer.Deserialize<PlayerLeavingLobbyRequest>(data);
+        
+
+        var playerId = _tokenManager.ValidateToken(playerLeavingLobbyRequest.Token);
+        if (playerId == null || playerId == 0)
+        {
+            Console.WriteLine("Invalid token.");
+            SendLeavingLobbyResponse(stream, "Invalid token.", false).Wait();
+            return;
+        }
+
+        var lobbyId = playerLeavingLobbyRequest.LobbyID;
+        var lobby = await _lobbyManager.FindLobby(lobbyId ?? "");
+        if (lobby == null)
+        {
+            Console.WriteLine($"Lobby with ID {lobbyId} not found.");
+            SendLeavingLobbyResponse(stream, $"Lobby with ID {lobbyId} not found.", false).Wait();
+            return;
+        }
+        if (lobby.Players == null || !lobby.Players.Contains(playerId.Value))
+        {
+            Console.WriteLine($"Player with ID {playerId} not found in lobby {lobbyId}.");
+            SendLeavingLobbyResponse(stream, $"Player with ID {playerId} not found in lobby {lobbyId}.", false).Wait();
+            return;
+        }
+        await _lobbyManager.RemovePlayerFromLobby(lobbyId ?? "", playerId.Value);
+        SendLeavingLobbyResponse(stream, $"Player with ID {playerId} left lobby {lobbyId}.", true).Wait();
+        //await _lobbyManager.RemovePlayerFromLobby(lobbyId, playerId);
+    }
 
     /// <summary>
     /// Updates the status of a given lobby and notifies players if the lobby is full.
@@ -137,7 +175,7 @@ public class Matchmaker
         }
 
         // Default status is not persisted
-        await lobbyManager.UpdateLobby(lobby.LobbyID ?? string.Empty, lobby.Status ?? Lobby.LobbyStatus.DefaultStatus);
+        await _lobbyManager.UpdateLobby(lobby.LobbyID ?? string.Empty, lobby.Status ?? Lobby.LobbyStatus.DefaultStatus);
 
         // Notify players if the lobby has just become full
         if (!wasFull && lobby.Status == Lobby.LobbyStatus.Full)
@@ -217,6 +255,18 @@ public class Matchmaker
             Status = lobby.Status?.ToString()
         };
         var responseData = MessagePackSerializer.Serialize(response);
+        await stream.WriteAsync(responseData, 0, responseData.Length);
+    }
+
+    private async Task SendLeavingLobbyResponse(NetworkStream stream, string message, bool success)
+    {
+        var playerLeavingLobbyResponse = new PlayerLeavingLobbyResponse
+        {
+            OperationTypeId = (int)OperationType.LeavingLobbyResponse,
+            Success = success,
+            Message = message
+        };
+        var responseData = MessagePackSerializer.Serialize(playerLeavingLobbyResponse);
         await stream.WriteAsync(responseData, 0, responseData.Length);
     }
 

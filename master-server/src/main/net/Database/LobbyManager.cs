@@ -30,6 +30,42 @@ public class LobbyManager
         await _lobbies.UpdateOneAsync(filter, update);
     }
 
+    public async Task RemovePlayerFromLobby(string lobbyId, int playerId)
+    {
+        var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyId);
+        var update = Builders<Lobby>.Update.Pull(lobby => lobby.Players, playerId);
+
+        var result = await _lobbies.UpdateOneAsync(filter, update);
+
+        // Optionally, handle the result to check if the update was successful
+        if(result.MatchedCount == 0)
+        {
+            Console.WriteLine($"Lobby with ID {lobbyId} not found.");
+        }
+        else if(result.ModifiedCount == 0)
+        {
+            Console.WriteLine($"Player with ID {playerId} not found in lobby {lobbyId}.");
+        }
+
+        // Update the lobby status if necessary
+        await UpdateLobbyStatusAfterPlayerLeft(lobbyId);
+    }
+
+    /// <summary>
+    /// Updates the status of a lobby after a player has left.
+    /// </summary>
+    /// <param name="lobbyId"></param>
+    /// <returns></returns> 
+    private async Task UpdateLobbyStatusAfterPlayerLeft(string lobbyId)
+    {
+        var lobby = await _lobbies.Find(lobby => lobby.LobbyID == lobbyId).FirstOrDefaultAsync();
+        if (lobby != null && lobby.Status == Lobby.LobbyStatus.Full && lobby.Players?.Count < lobby.MaxPlayers)
+        {
+            lobby.Status = Lobby.LobbyStatus.Waiting;
+            var update = Builders<Lobby>.Update.Set(lobby => lobby.Status, lobby.Status);
+            await _lobbies.UpdateOneAsync(l => l.LobbyID == lobbyId, update);
+        }
+    }
 
     /// <summary>
     /// Finds a lobby by its identifier.
