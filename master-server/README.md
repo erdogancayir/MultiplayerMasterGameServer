@@ -35,69 +35,6 @@ Development and Deployment
 
 This architecture aims to provide a robust, scalable, and efficient Master Server for your multiplayer game, ensuring smooth player experiences during login, matchmaking, and transitioning to game servers.
 
-```
-src
-├── main
-│   ├── config
-│   │   ├── DatabaseConfig.cs
-│   │   └── ServerConfig.cs
-|   |   └── LoadServerConfiguration.cs
-│   ├── tests
-│   │   ├── AuthTests.cs
-│   │   ├── MatchmakingTests.cs
-│   │   └── SocketTests.cs
-|   ├── Main.cs
-│   ├── net
-│   │   ├── Authentication
-│   │   │   ├── AuthService.cs
-│   │   │   └── TokenManager.cs
-│   │   ├── Database
-│   │   │   ├── DbInterface.cs
-│   │   │   ├── GameServerManager.cs
-│   │   │   ├── LobbyManager.cs
-│   │   │   ├── LogManager.cs
-│   │   │   ├── MatchmakingManager.cs
-│   │   │   ├── SessionManager.cs
-│   │   │   ├── GameManager.cs
-│   │   │   ├── GameStatisticsManager.cs
-│   │   │   ├── LeaderboardManager.cs
-│   │   │   └── PlayerManager.cs
-|   |   ├── Domain
-│   │   │   ├── AuthenticationPack.cs
-│   │   │   ├── BasePack.cs
-│   │   │   ├── GamePack.cs
-│   │   │   ├── LeaderboardEntryPack.cs
-│   │   │   ├── GameServerAllocationPack.cs
-│   │   │   ├── GameStatePack.cs
-│   │   │   ├── GenericMessagePack.cs
-│   │   │   ├── HeartbeatPack.cs
-│   │   │   ├── LobbyStatusUpdatePack.cs
-│   │   │   ├── MatchmakingPack.cs
-│   │   │   └── SignUpPack.cs
-│   │   ├── GameServerManagement
-│   │   │   ├── GameServerManager.cs
-│   │   │   └── HeartbeatMonitor.cs
-│   │   ├── Matchmaking
-│   │   │   └── Matchmaker.cs
-│   │   ├── Models
-│   │   │   ├── Lobby.cs
-|   |   |   ├── GameServer.cs
-|   |   |   ├── LogEntry.cs
-|   |   |   ├── Matchmaking.cs
-|   |   |   ├── LeaderboardEntry.cs
-|   |   |   ├── Game.cs
-│   │   │   └── Player.cs
-│   │   ├── SocketListener
-│   │   │   ├── ConnectionHandler.cs
-│   │   │   ├── ConnectionManager.cs
-│   │   │   └── SocketListener.cs
-│   │   ├── Utilities
-│   │   │   └── OperationTypes.cs
-|   |   └── Documents
-|   |       ├── ConfigDirectoryDocument.md
-|   |       └── DatabaseDirectoryDocument.md
-```
-
 Matchmaker Workflow
 
     Player Queueing:
@@ -132,21 +69,13 @@ Server Components and Their Corresponding Classes
 
     Matchmaking Service (Matchmaking Directory)
         Matchmaker.cs: Responsible for creating and managing game lobbies, matchmaking logic.
-        LobbyManager.cs: Manages the state and participants of game lobbies.
 
     Database Interface (Database Directory)
         DbInterface.cs: Central point for interacting with the MongoDB/DynamoDB database.
         PlayerManager.cs: Manages player-related data in the database.
         LobbyManager.cs: (Duplicate) Manages lobby data in the database. This might be an architectural oversight, as LobbyManager.cs is also listed under Matchmaking.
 
-    Game Server Management (GameServerManagement Directory)
-        GameServerManager.cs: Communicates with game server instances, managing their state and load balancing.
-        HeartbeatMonitor.cs: Regularly checks the status of game servers to ensure their availability.
-
     Models (Models Directory)
         Player.cs, Lobby.cs: Define the data structures for player and lobby data, respectively. These models are used by the database interface to interact with the database collections.
 
     Utilities (Utilities Directory)
-        Logger.cs: Provides logging capabilities for server operations, errors, and player activities.
-        Packet.cs: Handles data packet creation, manipulation, and reading for network communication, likely used across Socket Listener, Authentication, and Matchmaking services.
-
