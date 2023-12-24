@@ -8,6 +8,53 @@ namespace MasterServer
     {
         public static void Main(string[] args)
         {
+            bool serverRunning = true;
+
+            while (serverRunning)
+            {
+                try
+                {
+                    StartServer();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error starting the server: {ex.Message}");
+                    Console.WriteLine("Attempting to restart server...");
+
+                    Thread.Sleep(5000);
+                }
+            }
+        }
+
+        private static void StartServer()
+        {
+            // Load environment variables from .env file
+            DotEnv.Load();
+            Console.WriteLine("Starting Master Server...");
+
+            // Set up dependency injection
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            // Build the service provider
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            // Initialize counters
+            InitializeCounters(serviceProvider).GetAwaiter().GetResult();
+
+            var serverConfig = serviceProvider.GetService<ServerConfig>();
+            if (serverConfig == null)
+                throw new InvalidOperationException("Server configuration could not be loaded.");
+
+            // Initialize and start the socket listener
+            var socketListener = new SocketListener(serverConfig.SocketListenerPort, serviceProvider);
+            socketListener.Start();
+
+            // Keep the server running
+            KeepServerRunning();
+        }
+        /* public static void Main(string[] args)
+        {
             try 
             {
                 // Load environment variables from .env file
@@ -39,7 +86,7 @@ namespace MasterServer
             {
                 Console.WriteLine($"Error starting the server: {ex.Message}");
             }
-        }
+        } */
 
         #region Dependencies Setup
 

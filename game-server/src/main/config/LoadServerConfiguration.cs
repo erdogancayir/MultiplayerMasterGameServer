@@ -30,7 +30,6 @@ public class LoadServerConfiguration
             SocketUdpListenerPort = 8082,
             MasterServerTcpPort = 8080,
             MasterServerIp = "127.0.0.1",
-            JwtSecretKey = "secret-key"
         };
     }
 }

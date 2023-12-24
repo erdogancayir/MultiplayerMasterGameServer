@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Documents/ops/game-server/game-server.csproj": {}
+    "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Documents/ops/game-server/game-server.csproj": {
+    "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Documents/ops/game-server/game-server.csproj",
+        "projectUniqueName": "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj",
         "projectName": "game-server",
-        "projectPath": "/home/erdogancayir/Documents/ops/game-server/game-server.csproj",
+        "projectPath": "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj",
         "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Documents/ops/game-server/obj/",
+        "outputPath": "/home/erdogancayir/Documents/erdogi/game-server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

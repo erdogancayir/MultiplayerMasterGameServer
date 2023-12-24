@@ -13,14 +13,11 @@ public class SocketListener
     private UdpConnectionHandler _udpConnectionHandler;
     private Random _random = new Random();
 
-    public SocketListener(int tcpPort, int udpPort, IServiceProvider serviceProvider)
+    public SocketListener(int tcpPort, IServiceProvider serviceProvider)
     {
         _tcpPort = tcpPort;
-        _udpPort = udpPort;
         _serviceProvider = serviceProvider;
-        _udpConnectionHandler = new UdpConnectionHandler(_udpPort,
-                                                        _serviceProvider.GetRequiredService<PositionManager>(),
-                                                        _serviceProvider.GetRequiredService<ConnectionMasterServer>());
+        _udpConnectionHandler = _serviceProvider.GetRequiredService<UdpConnectionHandler>();
     }
 
     /// <summary>
@@ -69,7 +66,7 @@ public class SocketListener
             int connectionId = _random.Next();
 
             // Create a new TCP connection handler for the client
-            var clientConnection = new TcpConnectionHandler(tcpClient, _tcpConnectionManager, connectionId, _serviceProvider.GetRequiredService<PositionManager>());
+            var clientConnection = new TcpConnectionHandler(tcpClient, connectionId, _serviceProvider.GetRequiredService<PositionManager>());
 
             // Handle the TCP client in a new task or thread
             Task.Run(() => clientConnection.HandleNewConnection());

@@ -159,11 +159,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Documents/ops/test-master-server/test/test.csproj",
+      "projectUniqueName": "/home/erdogancayir/Documents/erdogi/test-master-server/test/test.csproj",
       "projectName": "test",
-      "projectPath": "/home/erdogancayir/Documents/ops/test-master-server/test/test.csproj",
+      "projectPath": "/home/erdogancayir/Documents/erdogi/test-master-server/test/test.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Documents/ops/test-master-server/test/obj/",
+      "outputPath": "/home/erdogancayir/Documents/erdogi/test-master-server/test/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

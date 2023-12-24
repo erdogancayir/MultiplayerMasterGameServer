@@ -47,6 +47,6 @@ public class LoadServerConfiguration
         string gameServerConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "src/main/config", "gameServerConfig.json");
         string json = File.ReadAllText(gameServerConfigPath);
         var gameServers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GameServer>>(json);
-        return new GameServerManager { GameServers = gameServers };
+        return new GameServerManager { GameServers = gameServers ?? new List<GameServer>() };
     }
 }

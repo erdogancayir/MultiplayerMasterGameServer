@@ -5,17 +5,15 @@ using MessagePack;
 public class UdpConnectionHandler
 {
     private UdpClient _udpClient; // UDP client for receiving data
-    private readonly int _udpPort;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
     private readonly PositionManager _positionManager;
     private readonly ConnectionMasterServer _connectionMasterServer;
 
-    public UdpConnectionHandler(int udpPort, 
-                                PositionManager positionManager,
-                                ConnectionMasterServer connectionMasterServer)
+    public UdpConnectionHandler(UdpClient udpClient, 
+                            PositionManager positionManager,
+                            ConnectionMasterServer connectionMasterServer)
     {
-        _udpPort = udpPort;
-        _udpClient = new UdpClient(_udpPort);
+        _udpClient = udpClient;
         _positionManager = positionManager;
         _connectionMasterServer = connectionMasterServer;
         InitializeUdpOperationHandlers();
@@ -35,7 +33,6 @@ public class UdpConnectionHandler
         try
         {
             BeginReceiveUdp();
-            Console.WriteLine($"UDP Listener started on port {_udpPort}.");
         }
         catch (Exception ex)
         {
@@ -113,11 +110,11 @@ public class UdpConnectionHandler
             string lobbyId = _positionManager.GetPlayerLobbyId(playerId) ?? "";
 
             UpdatePlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
-            BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate, senderEndPoint);
+            BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate);
             if (CheckGameEndCondition(playerPositionUpdate.X, playerPositionUpdate.Y))
             {
                 EndGame(lobbyId, playerId);
-                RemovePlayer(playerId);
+                _positionManager.RemovePlayer(playerId);
             }
         }
         catch (Exception ex)
@@ -133,7 +130,7 @@ public class UdpConnectionHandler
             var endPoint = MessagePackSerializer.Deserialize<EndPointPack>(data);
             int playerId = endPoint.PlayerId;
 
-            _positionManager.updatePlayerEndPoint(senderEndPoint, playerId);
+            await _positionManager.updatePlayerEndPoint(senderEndPoint, playerId);
         }
         catch (Exception ex)
         {
@@ -146,7 +143,7 @@ public class UdpConnectionHandler
     /// </summary>
     /// <param name="playerId"></param>
     /// <param name="playerPositionUpdate"></param>
-    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate, IPEndPoint senderEndPoint)
+    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
     {
         var data = MessagePackSerializer.Serialize(playerPositionUpdate);
 
@@ -154,7 +151,7 @@ public class UdpConnectionHandler
         {
             // Broadcast the position update to all players in the same lobby
             if (playerData.LobbyId != null)
-                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data, senderEndPoint, _udpClient);
+                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data, _udpClient);
         }
     }
 

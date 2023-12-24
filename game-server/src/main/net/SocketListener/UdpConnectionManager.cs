@@ -10,7 +10,7 @@ public class UdpConnectionManager
 
     public void SendMessage(byte[] message)
     {
-        var udpClient = new UdpClient();
-        udpClient.Send(message, message.Length, EndPoint);
+        /* var udpClient = new UdpClient();
+        udpClient.Send(message, message.Length, EndPoint); */
     }
 }
