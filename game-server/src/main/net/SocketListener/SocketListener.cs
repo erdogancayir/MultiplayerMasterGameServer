@@ -13,11 +13,14 @@ public class SocketListener
     private UdpConnectionHandler _udpConnectionHandler;
     private Random _random = new Random();
 
-    public SocketListener(int tcpPort, IServiceProvider serviceProvider)
+    public SocketListener(int tcpPort, int udpPort, IServiceProvider serviceProvider)
     {
         _tcpPort = tcpPort;
+        _udpPort = udpPort;
         _serviceProvider = serviceProvider;
-        _udpConnectionHandler = _serviceProvider.GetRequiredService<UdpConnectionHandler>();
+        _udpConnectionHandler = new UdpConnectionHandler(_udpPort,
+                                                        _serviceProvider.GetRequiredService<PositionManager>(),
+                                                        _serviceProvider.GetRequiredService<ConnectionMasterServer>());
     }
 
     /// <summary>

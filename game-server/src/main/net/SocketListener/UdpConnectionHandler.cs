@@ -5,15 +5,17 @@ using MessagePack;
 public class UdpConnectionHandler
 {
     private UdpClient _udpClient; // UDP client for receiving data
+    private readonly int _udpPort;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
     private readonly PositionManager _positionManager;
     private readonly ConnectionMasterServer _connectionMasterServer;
 
-    public UdpConnectionHandler(UdpClient udpClient, 
-                            PositionManager positionManager,
-                            ConnectionMasterServer connectionMasterServer)
+    public UdpConnectionHandler(int udpPort, 
+                                PositionManager positionManager,
+                                ConnectionMasterServer connectionMasterServer)
     {
-        _udpClient = udpClient;
+        _udpPort = udpPort;
+        _udpClient = new UdpClient(_udpPort);
         _positionManager = positionManager;
         _connectionMasterServer = connectionMasterServer;
         InitializeUdpOperationHandlers();
@@ -33,6 +35,7 @@ public class UdpConnectionHandler
         try
         {
             BeginReceiveUdp();
+            Console.WriteLine($"UDP Listener started on port {_udpPort}.");
         }
         catch (Exception ex)
         {

@@ -8,11 +8,11 @@ public class PositionManager
     private Dictionary<string, List<int>> _lobbyPlayers; // string : Lobby id New: PlayerIds -> List of PlayerIds
     private UdpClient _udpClient; // New: UdpClient
 
-    public PositionManager(UdpClient udpClient)
+    public PositionManager()
     {
         _playerData = new Dictionary<int, PlayerData>();
         _lobbyPlayers = new Dictionary<string, List<int>>();
-        _udpClient = udpClient;
+        //_udpClient = new UdpClient();
     }
 
     /// <summary>
@@ -116,5 +116,10 @@ public class PositionManager
             return data.LobbyId;
         }
         return null;
+    }
+
+    public void SetUdpClient(UdpClient udpClient)
+    {
+        _udpClient = udpClient;
     }
 }
