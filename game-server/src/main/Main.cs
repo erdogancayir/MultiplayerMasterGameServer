@@ -9,28 +9,38 @@ namespace GameServer
     {
         public static void Main(string[] args)
         {
-            try
+            while (true)
             {
-                DotEnv.Load();
-                Console.WriteLine("Starting Game Server...");
-                // Set up dependency injection
-                var serviceCollection = new ServiceCollection();
-                ConfigureServices(serviceCollection);
+                try
+                {
+                    StartGameServer();
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error occurred: {e.Message}. Server restarting...");
+                    Thread.Sleep(5000);
+                }
+            }
+        }
 
-                // Build the service provider
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-                 // Retrieve server configuration
-                var serverConfig = serviceProvider.GetService<ServerConfig>() ?? throw new InvalidOperationException("Server configuration not found.");
-                // Start the socket listener
-                var socketListener = new SocketListener(serverConfig.SocketTcpListenerPort, serverConfig.SocketUdpListenerPort, serviceProvider);
-                socketListener.Start();
-                // Keep the server running
-                KeepServerRunning();
-            }
-            catch (System.Exception e)
-            {
-                System.Console.WriteLine(e.Message);
-            }
+        private static void StartGameServer()
+        {
+            DotEnv.Load();
+            Console.WriteLine("Starting Game Server...");
+            // Set up dependency injection
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+            // Build the service provider
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+                // Retrieve server configuration
+            var serverConfig = serviceProvider.GetService<ServerConfig>() ?? throw new InvalidOperationException("Server configuration not found.");
+            // Start the socket listener
+            var socketListener = new SocketListener(serverConfig.SocketTcpListenerPort, serverConfig.SocketUdpListenerPort, serviceProvider);
+            socketListener.Start();
+            // Keep the server running
+            KeepServerRunning();
         }
 
         /// <summary>
@@ -62,9 +72,7 @@ namespace GameServer
         /// </summary>
         private static void KeepServerRunning()
         {
-            while (true)
-            {
-            }
+            while (true) {}
         }
     }
 }
