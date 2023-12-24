@@ -47,9 +47,9 @@ public class Matchmaker
 
             var allLobbies = await _lobbyManager.GetLobbies();
             var lobby = FindOrCreateLobby(allLobbies, playerId.Value);
+            await SendJoinLobbyResponse(stream, lobby);
             await _lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
             await UpdateLobbyStatus(lobby);
-            await SendJoinLobbyResponse(stream, lobby);
         }
         catch (Exception ex)
         {
@@ -216,6 +216,7 @@ public class Matchmaker
                 var gameStartResponse = new GameStartResponse
                 {
                     PlayerId = player.PlayerID,
+                    LobbyID = lobby.LobbyID,
                     OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerCount = lobby.Players?.Count ?? 0,
                 };

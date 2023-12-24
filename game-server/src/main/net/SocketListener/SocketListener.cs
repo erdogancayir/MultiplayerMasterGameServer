@@ -10,7 +10,6 @@ public class SocketListener
     private readonly int _udpPort;
     private TcpListener? _tcpListener;
     private readonly IServiceProvider _serviceProvider;
-    private readonly TcpConnectionManager _tcpConnectionManager;
     private UdpConnectionHandler _udpConnectionHandler;
     private Random _random = new Random();
 
@@ -22,7 +21,6 @@ public class SocketListener
         _udpConnectionHandler = new UdpConnectionHandler(_udpPort,
                                                         _serviceProvider.GetRequiredService<PositionManager>(),
                                                         _serviceProvider.GetRequiredService<ConnectionMasterServer>());
-        _tcpConnectionManager = _serviceProvider.GetRequiredService<TcpConnectionManager>();
     }
 
     /// <summary>

@@ -25,7 +25,8 @@ public class UdpConnectionHandler
     {
         _udpOperationHandlers = new Dictionary<OperationType, Action<IPEndPoint, byte[]>>
         {
-            { OperationType.PlayerPositionUpdate, HandlePlayerPositionUpdate }
+            { OperationType.PlayerPositionUpdate, HandlePlayerPositionUpdate },
+            { OperationType.EndPoint, HandlePlayerEndPointUpdate }
         };
     }
 
@@ -111,20 +112,32 @@ public class UdpConnectionHandler
             int playerId = playerPositionUpdate.PlayerId;
             string lobbyId = _positionManager.GetPlayerLobbyId(playerId) ?? "";
 
-            Console.WriteLine($"Received player position update from player {playerId}.");
-            Console.WriteLine($"X: {playerPositionUpdate.X}, Y: {playerPositionUpdate.Y}");
             UpdatePlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
-            BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate);
+            BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate, senderEndPoint);
             if (CheckGameEndCondition(playerPositionUpdate.X, playerPositionUpdate.Y))
             {
                 EndGame(lobbyId, playerId);
-                //BroadcastGameEnd();
+                RemovePlayer(playerId);
             }
-
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error handling player position update: {ex}");
+        }
+    }
+
+    public async void HandlePlayerEndPointUpdate(IPEndPoint senderEndPoint, byte[] data)
+    {
+        try
+        {
+            var endPoint = MessagePackSerializer.Deserialize<EndPointPack>(data);
+            int playerId = endPoint.PlayerId;
+
+            _positionManager.updatePlayerEndPoint(senderEndPoint, playerId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error handling player EndPoint update: {ex}");
         }
     }
 
@@ -133,7 +146,7 @@ public class UdpConnectionHandler
     /// </summary>
     /// <param name="playerId"></param>
     /// <param name="playerPositionUpdate"></param>
-    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
+    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate, IPEndPoint senderEndPoint)
     {
         var data = MessagePackSerializer.Serialize(playerPositionUpdate);
 
@@ -141,7 +154,7 @@ public class UdpConnectionHandler
         {
             // Broadcast the position update to all players in the same lobby
             if (playerData.LobbyId != null)
-                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data);
+                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data, senderEndPoint, _udpClient);
         }
     }
 

@@ -1720,11 +1720,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Desktop/ops/master-server/master-server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Documents/ops/master-server/master-server.csproj",
       "projectName": "master-server",
-      "projectPath": "/home/erdogancayir/Desktop/ops/master-server/master-server.csproj",
+      "projectPath": "/home/erdogancayir/Documents/ops/master-server/master-server.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Desktop/ops/master-server/obj/",
+      "outputPath": "/home/erdogancayir/Documents/ops/master-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

@@ -1007,11 +1007,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/erdogancayir/Desktop/ops/game-server/game-server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Documents/ops/game-server/game-server.csproj",
       "projectName": "game-server",
-      "projectPath": "/home/erdogancayir/Desktop/ops/game-server/game-server.csproj",
+      "projectPath": "/home/erdogancayir/Documents/ops/game-server/game-server.csproj",
       "packagesPath": "/home/erdogancayir/.nuget/packages/",
-      "outputPath": "/home/erdogancayir/Desktop/ops/game-server/obj/",
+      "outputPath": "/home/erdogancayir/Documents/ops/game-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/erdogancayir/.nuget/NuGet/NuGet.Config"

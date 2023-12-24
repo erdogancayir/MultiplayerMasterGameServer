@@ -7,14 +7,12 @@ public class TcpConnectionHandler
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
     private Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
-    private TcpConnectionManager _tcpConnectionManager;
     private int _connectionId;
     private readonly PositionManager _positionManager;
 
-    public TcpConnectionHandler(TcpClient client, TcpConnectionManager connectionManager, int connectionId, PositionManager positionManager) {
+    public TcpConnectionHandler(TcpClient client, int connectionId, PositionManager positionManager) {
         _client = client;
         _stream = client.GetStream();
-        _tcpConnectionManager = connectionManager;
         _connectionId = connectionId;
         _positionManager = positionManager;
         InitializeTcpOperationHandlers();
@@ -49,23 +47,29 @@ public class TcpConnectionHandler
     /// <summary>
     /// Handles a player lobby info message from the server.
     /// </summary>
-    public void PlayerLobbyInfo(NetworkStream stream, byte[] data, int connectionId)
+    public async void PlayerLobbyInfo(NetworkStream stream, byte[] data, int connectionId)
     {
         try
         {
             var playerLobbyInfo = MessagePackSerializer.Deserialize<PlayerLobbyInfo>(data);
-            Console.WriteLine($"PlayerLobbyInfo: {playerLobbyInfo.PlayerId} {playerLobbyInfo.LobbyId}");
-
-            var _endpoint = _client.Client.RemoteEndPoint as IPEndPoint;
-
+            var response = new PlayerLobbyInfoResponse
+            {
+                OperationTypeId = (int)OperationType.PlayerLobbyInfoResponse
+            };
+            //var _endpoint = _client.Client.RemoteEndPoint as IPEndPoint;
+            IPEndPoint remoteEndPoint = _client.Client.RemoteEndPoint as IPEndPoint;
             var playerData = new PlayerData
             {
                 PlayerId = playerLobbyInfo.PlayerId,
                 LobbyId = playerLobbyInfo.LobbyId,
-                EndPoint = _endpoint ?? throw new InvalidOperationException("Endpoint is null."),
+                EndPoint = remoteEndPoint ?? throw new InvalidOperationException("Endpoint is null."),
             };
+            _connectionId = playerLobbyInfo.PlayerId;
             // Add the player to the position manager
             _positionManager.AddOrUpdatePlayer(playerLobbyInfo.PlayerId, playerData);
+            response.Success = true;
+            var responseData = MessagePackSerializer.Serialize(response);
+            await stream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
         {
@@ -194,6 +198,6 @@ public class TcpConnectionHandler
     {
         _stream.Close();
         _client.Close();
-        _tcpConnectionManager.RemoveConnection(_connectionId);
+        _positionManager.RemovePlayer(_connectionId);
     }
 }

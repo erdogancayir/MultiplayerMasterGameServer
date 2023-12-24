@@ -54,7 +54,6 @@ namespace GameServer
                 return new ConnectionMasterServer(tcpClient);
             });
             services.AddSingleton<PositionManager>();
-            services.AddSingleton<TcpConnectionManager>();
             services.AddSingleton<UdpConnectionManager>();
         }
 
@@ -63,10 +62,8 @@ namespace GameServer
         /// </summary>
         private static void KeepServerRunning()
         {
-            // Logic to keep the server running, handle graceful shutdown, etc.
             while (true)
             {
-                // Server logic or waiting for termination signal
             }
         }
     }

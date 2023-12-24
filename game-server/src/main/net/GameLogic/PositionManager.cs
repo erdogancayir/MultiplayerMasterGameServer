@@ -1,4 +1,6 @@
 using System.Net.Sockets;
+using System.Net;
+using MessagePack;
 
 public class PositionManager
 {
@@ -20,11 +22,11 @@ public class PositionManager
     /// </summary>
     public void AddOrUpdatePlayer(int playerId, PlayerData data)
     {
-        _playerData[playerId] = data;
         if (data == null || string.IsNullOrEmpty(data.LobbyId))
         {
             return;
         }
+        _playerData[playerId] = data;
         if (!_lobbyPlayers.ContainsKey(data.LobbyId))
         {
             _lobbyPlayers[data.LobbyId] = new List<int>();
@@ -46,7 +48,7 @@ public class PositionManager
     /// <summary>
     /// Returns all players in the position manager that are in the same lobby as the given player.
     /// </summary>
-    public async Task SendMessageToLobby(int ownPlayerId, string lobbyId, byte[] message)
+    public async Task SendMessageToLobby(int ownPlayerId, string lobbyId, byte[] message, IPEndPoint senderEndPoint, UdpClient testw)
     {
         if (_lobbyPlayers.TryGetValue(lobbyId, out List<int>? playerIds))
         {
@@ -54,9 +56,18 @@ public class PositionManager
             {
                 if (ownPlayerId != playerId && _playerData.TryGetValue(playerId, out PlayerData? playerData))
                 {
-                    await _udpClient.SendAsync(message, message.Length, playerData.EndPoint);
+                    await testw.SendAsync(message, message.Length, playerData.EndPoint);
                 }
             }
+        }
+    }
+
+    public async Task updatePlayerEndPoint(IPEndPoint senderEndPoint, int playerId)
+    {
+        if (TryGetPlayerData(playerId, out PlayerData playerData))
+        {
+            playerData.EndPoint = senderEndPoint;
+            _playerData[playerId] = playerData;
         }
     }
 
