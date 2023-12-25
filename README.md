@@ -1,7 +1,8 @@
 ![resim](https://github.com/erdogancayir/gameserver/assets/94300378/f57d046b-1c3f-43a9-902a-4cafa98e74e8)
-![Screenshot from 2023-12-24 15-04-15](https://github.com/erdogancayir/gameserver/assets/94300378/91281de0-0f51-4e95-becd-1c37779d256b)
+
 ![Screenshot from 2023-12-25 15-56-01](https://github.com/erdogancayir/gameserver/assets/94300378/d413754d-4cf2-40f1-9a95-02c5441de2bb)
 
+![Screenshot from 2023-12-24 15-04-15](https://github.com/erdogancayir/gameserver/assets/94300378/91281de0-0f51-4e95-becd-1c37779d256b)
 
 MASTER SERVER
 
