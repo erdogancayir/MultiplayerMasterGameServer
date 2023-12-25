@@ -20,7 +20,6 @@ namespace MasterServer
                 {
                     Console.WriteLine($"Error starting the server: {ex.Message}");
                     Console.WriteLine("Attempting to restart server...");
-
                     Thread.Sleep(5000);
                 }
             }

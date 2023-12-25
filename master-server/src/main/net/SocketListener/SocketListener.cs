@@ -49,10 +49,10 @@ public class SocketListener
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
-            { OperationType.GameEndData, gameManager.HandleCreateGameRequest},
+            { OperationType.GameEndData, gameManager.HandleCreateGameRequest },
             // to do
-            { OperationType.GetGame, gameManager.HandleGetGameRequest},
             { OperationType.GetTopLeaderboardEntries, leaderboardManager.HandleGetTopLeaderboardEntriesRequest},
+            { OperationType.GetGame, gameManager.HandleGetGameRequest },
         };
     }
 

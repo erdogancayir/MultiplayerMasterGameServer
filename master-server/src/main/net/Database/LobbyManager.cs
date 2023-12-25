@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using MongoDB.Driver;
 
 public class LobbyManager
@@ -105,5 +106,10 @@ public class LobbyManager
         var filter = Builders<Lobby>.Filter.Eq(l => l.LobbyID, lobbyID);
         var update = Builders<Lobby>.Update.Set(l => l.Players, players);
         await _lobbies.UpdateOneAsync(filter, update);
+    }
+
+    public async Task DeleteLobbyAsync(string? lobbyID)
+    {
+        await _lobbies.DeleteOneAsync(l => l.LobbyID == lobbyID);
     }
 }

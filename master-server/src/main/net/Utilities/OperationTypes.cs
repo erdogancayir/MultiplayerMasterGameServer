@@ -24,6 +24,7 @@ public enum OperationType
     CreateGame = 450,
     UpdateGame = 451,
     GetGame = 452,
+    GetGameResponsePack = 454,
     GameEndData = 1000,
     GameSaveResponsePack = 1001,
     // Game Statistics Operations

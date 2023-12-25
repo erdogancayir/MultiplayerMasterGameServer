@@ -6,11 +6,13 @@ public class GameManager
 {
     private readonly IMongoCollection<Game> _games;
     private readonly LeaderboardManager _leaderboardManager;
+    private readonly LobbyManager _lobbyManager;
 
-    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager)
+    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager, LobbyManager lobbyManager)
     {
         _games = dbInterface.GetCollection<Game>("Games");
         _leaderboardManager = leaderboardManager;
+        _lobbyManager = lobbyManager;
     }
 
     /// <summary>
@@ -30,6 +32,8 @@ public class GameManager
 
             if (createGameRequest == null || createGameRequest.GameData == null)
             {
+                response.Success = false;
+                await clientStream.WriteAsync(MessagePackSerializer.Serialize(response), 0, 1);
                 Console.WriteLine("CreateGameRequest is null.");
                 return;
             }
@@ -41,6 +45,7 @@ public class GameManager
                 PlayerID = createGameRequest.PlayerID
             };
             await CreateGameAsync(game);
+            await _lobbyManager.DeleteLobbyAsync(game.LobbyID);
             response.Success = true;
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
@@ -55,6 +60,52 @@ public class GameManager
 
     public async void HandleGetGameRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
+        Console.WriteLine("GetGameRequest received.");
+        try
+        {
+        var getGameRequest = MessagePackSerializer.Deserialize<GetGamePack>(data);
+            var response = new GetGameResponsePack
+            {
+                OperationTypeId = (int)OperationType.GetGameResponsePack
+            };
+
+            if (getGameRequest == null || getGameRequest.LobbyId == null)
+            {
+                response.Success = false;
+                await clientStream.WriteAsync(MessagePackSerializer.Serialize(response));
+                Console.WriteLine("GetGameRequest is null or invalid.");
+                return;
+            }
+
+            var game = await GetGameAsyncByLobbyId(getGameRequest.LobbyId);
+            if (game != null)
+            {
+                response.Success = true;
+                response.GameData = game;
+            }
+            else
+            {
+                response.Success = false; // No game found for the given lobbyId
+            }
+
+            var responseData = MessagePackSerializer.Serialize(response);
+            await clientStream.WriteAsync(responseData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing GetGameRequest: {ex.Message}");
+        }
+    }
+
+    private async Task<Game?> GetGameAsyncByLobbyId(string lobbyId)
+    {
+        // Define the filter to search for the game by lobbyId
+        var filter = Builders<Game>.Filter.Eq(g => g.LobbyID, lobbyId);
+
+        // Use the Find method to search the collection and retrieve the game
+        // Assuming that there's only one game per lobbyId or you're interested in the first one
+        var game = await _games.Find(filter).FirstOrDefaultAsync();
+        return game; 
     }
 
     /// <summary>

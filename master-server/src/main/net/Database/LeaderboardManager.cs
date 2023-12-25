@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using MessagePack;
 using MongoDB.Driver;
 
 public class LeaderboardManager
@@ -12,7 +13,28 @@ public class LeaderboardManager
 
     public async void HandleGetTopLeaderboardEntriesRequest(NetworkStream clientStream, byte[] data, int connectionId)
     {
-        
+        try
+        {
+            // Deserialize the request to get the number of top entries needed
+            var request = MessagePackSerializer.Deserialize<GetTopLeaderboardPack>(data);
+            int limit = request.TopLimit;
+
+            // Fetch the top leaderboard entries
+            var topEntries = await GetTopPlayersAsync(limit);
+
+            // Prepare the response
+            var response = new GetTopLeaderboardResponsePack
+            {
+                LeaderboardEntries = topEntries
+            };
+            // Serialize and send the response
+            var responseData = MessagePackSerializer.Serialize(response);
+            await clientStream.WriteAsync(responseData, 0, responseData.Length);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing GetTopLeaderboardEntriesRequest: {ex.Message}");
+        }
     }
 
     /// <summary>
