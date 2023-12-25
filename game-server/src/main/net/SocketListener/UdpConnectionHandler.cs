@@ -4,7 +4,7 @@ using MessagePack;
 
 public class UdpConnectionHandler
 {
-    private UdpClient _udpClient; // UDP client for receiving data
+    private UdpClient _udpClient;
     private readonly int _udpPort;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
     private readonly PositionManager _positionManager;
@@ -52,6 +52,7 @@ public class UdpConnectionHandler
     {
         try
         {
+            _positionManager.SetUdpClient(_udpClient);
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             byte[] receivedBytes = _udpClient.EndReceive(ar, ref remoteEndPoint);
 
@@ -146,7 +147,7 @@ public class UdpConnectionHandler
     /// </summary>
     /// <param name="playerId"></param>
     /// <param name="playerPositionUpdate"></param>
-    private async void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
+    private void BroadcastPlayerPositionToLobby(int playerId, PlayerPositionUpdate playerPositionUpdate)
     {
         var data = MessagePackSerializer.Serialize(playerPositionUpdate);
 
@@ -154,7 +155,7 @@ public class UdpConnectionHandler
         {
             // Broadcast the position update to all players in the same lobby
             if (playerData.LobbyId != null)
-                await _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data, _udpClient);
+                _positionManager.SendMessageToLobby(playerId, playerData.LobbyId, data);
         }
     }
 

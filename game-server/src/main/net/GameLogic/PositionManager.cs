@@ -6,13 +6,12 @@ public class PositionManager
 {
     private Dictionary<int, PlayerData> _playerData; // int : PlayerId New: PlayerData -> PlayerId to PlayerData
     private Dictionary<string, List<int>> _lobbyPlayers; // string : Lobby id New: PlayerIds -> List of PlayerIds
-    private UdpClient _udpClient; // New: UdpClient
+    private UdpClient? _udpClient; // New: UdpClient
 
     public PositionManager()
     {
         _playerData = new Dictionary<int, PlayerData>();
         _lobbyPlayers = new Dictionary<string, List<int>>();
-        //_udpClient = new UdpClient();
     }
 
     /// <summary>
@@ -48,7 +47,7 @@ public class PositionManager
     /// <summary>
     /// Returns all players in the position manager that are in the same lobby as the given player.
     /// </summary>
-    public async Task SendMessageToLobby(int ownPlayerId, string lobbyId, byte[] message, UdpClient testw)
+    public void SendMessageToLobby(int ownPlayerId, string lobbyId, byte[] message)
     {
         if (_lobbyPlayers.TryGetValue(lobbyId, out List<int>? playerIds))
         {
@@ -56,7 +55,7 @@ public class PositionManager
             {
                 if (ownPlayerId != playerId && _playerData.TryGetValue(playerId, out PlayerData? playerData))
                 {
-                    await testw.SendAsync(message, message.Length, playerData.EndPoint);
+                    _udpClient?.SendAsync(message, message.Length, playerData.EndPoint);
                 }
             }
         }

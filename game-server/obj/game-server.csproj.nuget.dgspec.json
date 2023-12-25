@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj": {}
+    "/root/erdogi/game-server/game-server.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj": {
+    "/root/erdogi/game-server/game-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj",
+        "projectUniqueName": "/root/erdogi/game-server/game-server.csproj",
         "projectName": "game-server",
-        "projectPath": "/home/erdogancayir/Documents/erdogi/game-server/game-server.csproj",
-        "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Documents/erdogi/game-server/obj/",
+        "projectPath": "/root/erdogi/game-server/game-server.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/root/erdogi/game-server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -71,7 +71,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/erdogancayir/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
