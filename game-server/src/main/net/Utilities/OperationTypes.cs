@@ -11,4 +11,5 @@ public enum OperationType
     GameEndData = 1000, // TCP This operation is sent by the server to the client to notify the client that the game has ended.
     Test = 666,
     EndPoint = 602,
+    GameOverRequest = 603,
 }

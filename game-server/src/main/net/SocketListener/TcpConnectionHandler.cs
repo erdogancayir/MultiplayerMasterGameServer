@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Security.AccessControl;
 using MessagePack;
 
 public class TcpConnectionHandler
@@ -9,12 +10,15 @@ public class TcpConnectionHandler
     private Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
     private int _connectionId;
     private readonly PositionManager _positionManager;
+    private readonly ConnectionMasterServer _connectionMasterServer;
 
-    public TcpConnectionHandler(TcpClient client, int connectionId, PositionManager positionManager) {
+    public TcpConnectionHandler(TcpClient client, int connectionId, PositionManager positionManager,
+                                    ConnectionMasterServer connectionMasterServer) {
         _client = client;
         _stream = client.GetStream();
         _connectionId = connectionId;
         _positionManager = positionManager;
+        _connectionMasterServer = connectionMasterServer;
         InitializeTcpOperationHandlers();
     }
 
@@ -23,7 +27,8 @@ public class TcpConnectionHandler
         _operationHandlers = new Dictionary<OperationType, Action<NetworkStream, byte[], int>>
         {
             { OperationType.PlayerLobbyInfo, PlayerLobbyInfo }, // New: PlayerLobbyInfo
-            { OperationType.HeartbeatPing, HeartbeatPing } // New: HeartbeatPing
+            { OperationType.HeartbeatPing, HeartbeatPing }, // New: HeartbeatPing
+            { OperationType.GameOverRequest, GameOverRequest } // New: HeartbeatPing
         };
     }
 
@@ -41,6 +46,90 @@ public class TcpConnectionHandler
         catch (Exception ex)
         {
             Console.WriteLine($"Error deserializing heartbeat message: {ex.Message}");
+        }
+    }
+
+    public async void GameOverRequest(NetworkStream stream, byte[] data, int connectionId)
+    {
+        try
+        {
+            var gameOverRequest = MessagePackSerializer.Deserialize<GameOverPack>(data);
+            var lobbyId = gameOverRequest.LobbyId;
+            var winnerPlayerId = gameOverRequest.WinnerPlayerId;
+            Console.WriteLine($"GameOverRequest received from server {lobbyId} at {winnerPlayerId}.");
+            EndGame(lobbyId ?? string.Empty, winnerPlayerId);
+            CleanupLobby(lobbyId ?? string.Empty);
+
+            var response = new GameOverResponse
+            {
+                OperationTypeId = (int)OperationType.GameOverRequest,
+                Success = true,
+                LobbyId = lobbyId
+            };
+
+            var responseData = MessagePackSerializer.Serialize(response);
+            await stream.WriteAsync(responseData, 0, responseData.Length);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GameOverRequest: {ex}");
+        }
+    }
+
+    /// <summary>
+    /// Ends the game.
+    /// </summary>
+    /// <param name="lobbyId"></param>
+    /// <param name="playerId"></param>
+    public void EndGame(string lobbyId, int playerId)
+    {
+        Game gameData = new Game
+        {
+            LobbyID = lobbyId,
+            EndTime = DateTime.UtcNow,
+            Status = Game.GameStatus.Completed
+        };
+
+        var gameEndData = new GameSavePack
+        {
+            OperationTypeId = (int)OperationType.GameEndData,
+            GameData = gameData,
+            PlayerID = playerId,
+        };
+
+        var data = MessagePackSerializer.Serialize(gameEndData);
+
+        SendDataToMasterServer(data);
+    }
+
+    public void SendDataToMasterServer(byte[] data)
+    {
+        try
+        {
+            _connectionMasterServer.SendData(data);
+            var response = _connectionMasterServer.ReceiveData();
+            var createGameResponse = MessagePackSerializer.Deserialize<GameSaveResponsePack>(response);
+            if (createGameResponse.Success)
+                Console.WriteLine($"Game saved.");
+            else
+                Console.WriteLine($"Failed to save game.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending data to Master Server: {ex}");
+        }
+    }
+
+    private void CleanupLobby(string lobbyId)
+    {
+        if (_positionManager.LobbyExists(lobbyId))
+        {
+            var playerIds = _positionManager.GetPlayerIdsInLobby(lobbyId);
+            foreach (var playerId in playerIds)
+            {
+                _positionManager.RemovePlayer(playerId);
+            }
+            _positionManager.RemoveLobby(lobbyId); //to remove the lobby
         }
     }
 

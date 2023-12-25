@@ -15,4 +15,7 @@ public class GameSaveResponsePack : BasePack
 {
     [Key(1)]
     public bool Success { get; set; }
+
+    [Key(2)]
+    public string? LobbyID { get; set; }
 }

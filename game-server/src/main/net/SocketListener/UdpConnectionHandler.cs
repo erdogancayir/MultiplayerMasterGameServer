@@ -8,16 +8,13 @@ public class UdpConnectionHandler
     private readonly int _udpPort;
     private Dictionary<OperationType, Action<IPEndPoint, byte[]>>? _udpOperationHandlers;
     private readonly PositionManager _positionManager;
-    private readonly ConnectionMasterServer _connectionMasterServer;
 
     public UdpConnectionHandler(int udpPort, 
-                                PositionManager positionManager,
-                                ConnectionMasterServer connectionMasterServer)
+                                PositionManager positionManager)
     {
         _udpPort = udpPort;
         _udpClient = new UdpClient(_udpPort);
         _positionManager = positionManager;
-        _connectionMasterServer = connectionMasterServer;
         InitializeUdpOperationHandlers();
     }
 
@@ -115,11 +112,6 @@ public class UdpConnectionHandler
 
             UpdatePlayerPosition(playerId, playerPositionUpdate.X, playerPositionUpdate.Y);
             BroadcastPlayerPositionToLobby(playerId, playerPositionUpdate);
-            if (CheckGameEndCondition(playerPositionUpdate.X, playerPositionUpdate.Y))
-            {
-                EndGame(lobbyId, playerId);
-                _positionManager.RemovePlayer(playerId);
-            }
         }
         catch (Exception ex)
         {
@@ -172,68 +164,6 @@ public class UdpConnectionHandler
             playerData.X = x;
             playerData.Y = y;
             _positionManager.AddOrUpdatePlayer(playerId, playerData);
-        }
-    }
-
-    /// <summary>
-    /// Checks if the game end condition is met.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    private bool CheckGameEndCondition(float x, float y)
-    {
-        float   TargetX = 100;
-        float   TargetY = 100;
-
-        return (x == TargetX && y == TargetY);
-    }
-
-    /// <summary>
-    /// Ends the game.
-    /// </summary>
-    /// <param name="lobbyId"></param>
-    /// <param name="playerId"></param>
-    public void EndGame(string lobbyId, int playerId)
-    {
-        Game gameData = CreateGameData(lobbyId);
-
-        var gameEndData = new GameSavePack
-        {
-            OperationTypeId = (int)OperationType.GameEndData,
-            GameData = gameData,
-            PlayerID = playerId
-        };
-
-        var data = MessagePackSerializer.Serialize(gameEndData);
-
-        SendDataToMasterServer(data);
-    }
-
-    private Game CreateGameData(string lobbyId)
-    {
-        return new Game
-        {
-            LobbyID = lobbyId,
-            EndTime = DateTime.UtcNow,
-            Status = Game.GameStatus.Completed
-        };
-    }
-
-    public void SendDataToMasterServer(byte[] data)
-    {
-        try
-        {
-            _connectionMasterServer.SendData(data);
-            var response = _connectionMasterServer.ReceiveData();
-            var createGameResponse = MessagePackSerializer.Deserialize<GameSaveResponsePack>(response);
-            if (createGameResponse.Success)
-                Console.WriteLine($"Game saved.");
-            else
-                Console.WriteLine($"Failed to save game.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending data to Master Server: {ex}");
         }
     }
 }

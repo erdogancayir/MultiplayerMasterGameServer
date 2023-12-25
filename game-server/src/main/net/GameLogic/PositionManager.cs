@@ -121,4 +121,14 @@ public class PositionManager
     {
         _udpClient = udpClient;
     }
+
+    public bool LobbyExists(string lobbyId)
+    {
+        return _lobbyPlayers.ContainsKey(lobbyId);
+    }
+
+    public void RemoveLobby(string lobbyId)
+    {
+        _lobbyPlayers.Remove(lobbyId);
+    }
 }

@@ -23,7 +23,7 @@ public class TcpClientExample
                     var signUpRequest = new SignUpRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "bb",
+                        Username = "rrbb",
                         Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(signUpRequest);
@@ -33,7 +33,7 @@ public class TcpClientExample
                     var authenticationRequest = new AuthenticationRequest
                     {
                         OperationTypeId = (int)operationType,
-                        Username = "bb",
+                        Username = "rrbb",
                         Password = "22"
                     };
                     dataToSend = MessagePackSerializer.Serialize(authenticationRequest);
