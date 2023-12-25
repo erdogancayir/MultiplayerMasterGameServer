@@ -1002,19 +1002,19 @@
     ]
   },
   "packageFolders": {
-    "/root/.nuget/packages/": {}
+    "/home/erdogancayir/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/root/erdogi/game-server/game-server.csproj",
+      "projectUniqueName": "/home/erdogancayir/Desktop/yenile/game-server/game-server.csproj",
       "projectName": "game-server",
-      "projectPath": "/root/erdogi/game-server/game-server.csproj",
-      "packagesPath": "/root/.nuget/packages/",
-      "outputPath": "/root/erdogi/game-server/obj/",
+      "projectPath": "/home/erdogancayir/Desktop/yenile/game-server/game-server.csproj",
+      "packagesPath": "/home/erdogancayir/.nuget/packages/",
+      "outputPath": "/home/erdogancayir/Desktop/yenile/game-server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/root/.nuget/NuGet/NuGet.Config"
+        "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

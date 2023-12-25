@@ -61,7 +61,7 @@ public class PositionManager
         }
     }
 
-    public async Task updatePlayerEndPoint(IPEndPoint senderEndPoint, int playerId)
+    public void updatePlayerEndPoint(IPEndPoint senderEndPoint, int playerId)
     {
         if (TryGetPlayerData(playerId, out PlayerData playerData))
         {

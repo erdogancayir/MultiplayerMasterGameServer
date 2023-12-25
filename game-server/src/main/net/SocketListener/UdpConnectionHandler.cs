@@ -127,14 +127,14 @@ public class UdpConnectionHandler
         }
     }
 
-    public async void HandlePlayerEndPointUpdate(IPEndPoint senderEndPoint, byte[] data)
+    public void HandlePlayerEndPointUpdate(IPEndPoint senderEndPoint, byte[] data)
     {
         try
         {
             var endPoint = MessagePackSerializer.Deserialize<EndPointPack>(data);
             int playerId = endPoint.PlayerId;
 
-            await _positionManager.updatePlayerEndPoint(senderEndPoint, playerId);
+            _positionManager.updatePlayerEndPoint(senderEndPoint, playerId);
         }
         catch (Exception ex)
         {
