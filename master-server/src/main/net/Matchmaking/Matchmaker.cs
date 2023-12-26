@@ -201,7 +201,7 @@ public class Matchmaker
             Console.WriteLine("Players list or lobby is null.");
             return;
         }
-
+        var lobbyPlayers = await GetPlayersFromIDs(lobby.Players);
         foreach (var player in players)
         {
             try
@@ -219,6 +219,7 @@ public class Matchmaker
                     LobbyID = lobby.LobbyID,
                     OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerCount = lobby.Players?.Count ?? 0,
+                    PlayersInLobby = lobbyPlayers.Select(p => new PlayerInfo { PlayerID = p.PlayerID, Username = p.Username }).ToList()
                 };
 
                 var responseData = MessagePackSerializer.Serialize(gameStartResponse);
@@ -231,6 +232,22 @@ public class Matchmaker
             }
         }
     }
+
+    public async Task<List<Player>> GetPlayersFromIDs(List<int> playerIDs)
+    {
+        var players = new List<Player>();
+        foreach (var id in playerIDs)
+        {
+            // Bu kısımda, PlayerID'ye göre veritabanından Player nesnesini çekin
+            var player = await this.playerManager.GetPlayerById(id); // GetPlayerById, veritabanınızdan ilgili oyuncuyu çeken metodunuz
+            if (player != null)
+            {
+                players.Add(player);
+            }
+        }
+        return players;
+    }
+
 
     private async Task<List<Player>> RetrievePlayersInLobby(List<int>? playerIDs)
     {
