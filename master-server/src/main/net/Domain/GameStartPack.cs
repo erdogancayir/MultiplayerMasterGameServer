@@ -21,10 +21,9 @@ public class GameStartResponse : BasePack
     public int PlayerId { get; set; }
     [Key(2)]
     public string? LobbyID { get; set; }
-    [Key(4)]
+
+    [Key(3)]
     public int PlayerCount { get; set; }
-    [Key(5)]
-    public List<PlayerInfo> PlayersInLobby { get; set; }
 }
 
 public class PlayerInfo

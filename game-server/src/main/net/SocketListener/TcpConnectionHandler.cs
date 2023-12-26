@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.AccessControl;
@@ -9,11 +10,13 @@ public class TcpConnectionHandler
     private readonly NetworkStream _stream;
     private Dictionary<OperationType, Action<NetworkStream, byte[], int>>? _operationHandlers;
     private int _connectionId;
+    private string _lobbyId;
     private readonly PositionManager _positionManager;
     private readonly ConnectionMasterServer _connectionMasterServer;
 
     public TcpConnectionHandler(TcpClient client, int connectionId, PositionManager positionManager,
-                                    ConnectionMasterServer connectionMasterServer) {
+                                    ConnectionMasterServer connectionMasterServer)
+    {
         _client = client;
         _stream = client.GetStream();
         _connectionId = connectionId;
@@ -28,10 +31,20 @@ public class TcpConnectionHandler
         {
             { OperationType.PlayerLobbyInfo, PlayerLobbyInfo }, // New: PlayerLobbyInfo
             { OperationType.HeartbeatPing, HeartbeatPing }, // New: HeartbeatPing
-            { OperationType.GameOverRequest, GameOverRequest } // New: HeartbeatPing
-            { OperationType.GameOverRequest, GameOverRequest } // New: HeartbeatPing
+            { OperationType.GameOverRequest, GameOverRequest }, // New: HeartbeatPing
             { OperationType.LeaveLobbyRequest, HandlePlayerLeavingLobby },
+            { OperationType.PlayerJoinedLobbyRequest, HandlePlayerJoinedLobby }
+
         };
+    }
+
+    private void HandlePlayerJoinedLobby(NetworkStream stream, byte[] data, int arg3)
+    {
+        var playerJoinedLobbyRequest = MessagePackSerializer.Deserialize<PlayerJoinedLobbyRequest>(data);
+
+        _connectionId = playerJoinedLobbyRequest.PlayerID;
+        _lobbyId = playerJoinedLobbyRequest.LobbyID;
+        Console.WriteLine($"Player {_connectionId} connected.");
     }
 
     /// <summary>
@@ -65,16 +78,6 @@ public class TcpConnectionHandler
             Console.WriteLine($"GameOverRequest received from server {lobbyId} at {winnerPlayerId}.");
             EndGame(lobbyId ?? string.Empty, winnerPlayerId);
             CleanupLobby(lobbyId ?? string.Empty);
-
-            var response = new GameOverResponse
-            {
-                OperationTypeId = (int)OperationType.GameOverRequest,
-                Success = true,
-                LobbyId = lobbyId
-            };
-
-            var responseData = MessagePackSerializer.Serialize(response);
-            await stream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
         {
@@ -87,17 +90,11 @@ public class TcpConnectionHandler
     /// </summary>
     public void EndGame(string lobbyId, int playerId)
     {
-        Game gameData = new Game
-        {
-            LobbyID = lobbyId,
-            EndTime = DateTime.UtcNow,
-            Status = Game.GameStatus.Completed
-        };
-
         var gameEndData = new GameSavePack
         {
             OperationTypeId = (int)OperationType.GameEndData,
-            GameData = gameData,
+            LobbyID = lobbyId,
+            EndTime = DateTime.UtcNow,
             PlayerID = playerId,
         };
 
@@ -128,12 +125,12 @@ public class TcpConnectionHandler
     {
         if (_positionManager.LobbyExists(lobbyId))
         {
-            var playerIds = _positionManager.GetPlayerIdsInLobby(lobbyId);
+            var playerIds = new List<int>(_positionManager.GetPlayerIdsInLobby(lobbyId));
             foreach (var playerId in playerIds)
             {
                 _positionManager.RemovePlayer(playerId);
             }
-            _positionManager.RemoveLobby(lobbyId); //to remove the lobby
+            _positionManager.RemoveLobby(lobbyId);
         }
     }
 
@@ -158,6 +155,7 @@ public class TcpConnectionHandler
                 EndPoint = remoteEndPoint ?? throw new InvalidOperationException("Endpoint is null."),
             };
             _connectionId = playerLobbyInfo.PlayerId;
+            Console.WriteLine($"Player {_connectionId} joined lobby {playerLobbyInfo.LobbyId}.");
             // Add the player to the position manager
             _positionManager.AddOrUpdatePlayer(playerLobbyInfo.PlayerId, playerData);
             response.Success = true;
@@ -179,8 +177,8 @@ public class TcpConnectionHandler
         try
         {
             var playerLeavingLobbyRequest = MessagePackSerializer.Deserialize<PlayerLeavingLobbyRequest>(data);
-            var lobbyId = playerLeavingLobbyRequest.LobbyId;
-            var playerId = playerLeavingLobbyRequest.PlayerId;
+            var lobbyId = playerLeavingLobbyRequest.LobbyID;
+            var playerId = playerLeavingLobbyRequest.PlayerID;
             Console.WriteLine($"Player {playerId} left lobby {lobbyId}.");
             _positionManager.RemovePlayer(playerId);
         }
@@ -226,6 +224,7 @@ public class TcpConnectionHandler
                 }
                 else
                 {
+                    Console.WriteLine($"Client disconnected. PlayerId : {_connectionId} ");
                     CloseConnection();
                 }
             }

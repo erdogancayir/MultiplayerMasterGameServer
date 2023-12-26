@@ -20,12 +20,15 @@ public enum OperationType
     // Lobby Management
     UpdateLobbyStatus = 300,
     StartGameCountdown = 301,
+    DisconnectedPlayerResponse = 402,
     // Game Operations
     CreateGame = 450,
     UpdateGame = 451,
     GetGame = 452,
     GetGameResponsePack = 454,
+    GetTopLeaderboardEntriesResponse = 457,
     GameEndData = 1000,
+    GameEndInfo = 1002,
     GameSaveResponsePack = 1001,
     // Game Statistics Operations
     CreateGameStatistics = 453,

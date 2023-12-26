@@ -4,10 +4,11 @@ using MessagePack;
 public class GameSavePack : BasePack
 {
     [Key(1)]
-    public Game? GameData { get; set; }
-
+    public string? LobbyID  { get; set; }
     [Key(2)]
     public int PlayerID { get; set; }
+    [Key(3)]
+    public DateTime EndTime { get; set; }
 }
 
 [MessagePackObject]

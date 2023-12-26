@@ -4,17 +4,19 @@ using MessagePack;
 public class GetTopLeaderboardPack : BasePack
 {
     [Key(1)]
-    public int TopLimit { get; set; }
+    public int TopLimit { get; set; } = 10;
 }
 
 public class GetTopLeaderboardResponsePack : BasePack
 {
     [Key(1)]
-    public string? LeaderboardEntryID { get; set; }
+    public string? Username { get; set; }
     [Key(2)]
-    public int? PlayerID { get; set; }
-    [Key(3)]
     public int TotalPoints { get; set; }
-    [Key(4)]
-    public string Username { get; set; }
+}
+
+public class SendTopLeaderboardResponsePack : BasePack
+{
+    [Key(1)]
+    public List<GetTopLeaderboardResponsePack>? TopEntries { get; set; }
 }

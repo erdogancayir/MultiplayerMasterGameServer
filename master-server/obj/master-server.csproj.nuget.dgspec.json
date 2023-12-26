@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj": {}
+    "/root/Erdogi2/master-server/master-server.csproj": {}
   },
   "projects": {
-    "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj": {
+    "/root/Erdogi2/master-server/master-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj",
+        "projectUniqueName": "/root/Erdogi2/master-server/master-server.csproj",
         "projectName": "master-server",
-        "projectPath": "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj",
-        "packagesPath": "/home/erdogancayir/.nuget/packages/",
-        "outputPath": "/home/erdogancayir/Desktop/Erdogi2/master-server/obj/",
+        "projectPath": "/root/Erdogi2/master-server/master-server.csproj",
+        "packagesPath": "/root/.nuget/packages/",
+        "outputPath": "/root/Erdogi2/master-server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
+          "/root/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"

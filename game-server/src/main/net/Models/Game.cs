@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
-public class Game
+public class GameOver
 {
     public string? LobbyID { get; set; }
     public DateTime EndTime { get; set; }

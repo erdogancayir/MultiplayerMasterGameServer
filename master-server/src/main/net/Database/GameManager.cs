@@ -8,13 +8,16 @@ public class GameManager
     private readonly LeaderboardManager _leaderboardManager;
     private readonly LobbyManager _lobbyManager;
     private readonly PlayerManager _playerManager;
+    private readonly ConnectionManager _connectionManager;
 
-    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager, LobbyManager lobbyManager, PlayerManager playerManager)
+    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager,
+                         LobbyManager lobbyManager, PlayerManager playerManager, ConnectionManager connectionManager)
     {
         _games = dbInterface.GetCollection<Game>("Games");
         _leaderboardManager = leaderboardManager;
         _lobbyManager = lobbyManager;
         _playerManager = playerManager;
+        _connectionManager = connectionManager;
     }
 
     /// <summary>
@@ -31,23 +34,43 @@ public class GameManager
             var createGameRequest = MessagePackSerializer.Deserialize<GameSavePack>(data);
             var response = new GameSaveResponsePack();
             response.OperationTypeId = (int)OperationType.GameSaveResponsePack;
-
-            if (createGameRequest == null || createGameRequest.GameData == null)
+            Console.WriteLine($"GameSaveResponsePack created.");
+            if (createGameRequest == null)
             {
                 response.Success = false;
                 await clientStream.WriteAsync(MessagePackSerializer.Serialize(response), 0, 1);
                 Console.WriteLine("CreateGameRequest is null.");
                 return;
             }
+            Console.WriteLine($"CreateGameRequest is not null. {createGameRequest.LobbyID}");
+            List<int> PlayersIds = await _lobbyManager.GetPlayersIds(createGameRequest.LobbyID);
+            if (PlayersIds != null) // null kontrolü eklendi
+            {
+                foreach (var playerId in PlayersIds)
+                {
+                    var connection = _connectionManager.GetConnection(playerId);
+                    if (connection != null)
+                    {
+                        var gameEndInfo = new GameEndInfoPack();
+                        gameEndInfo.OperationTypeId = (int)OperationType.GameEndInfo;
+                        gameEndInfo.PlayerId = playerId;
+                        gameEndInfo.Username = await _playerManager.GetUsernameByPlayerId(createGameRequest.PlayerID);
+                        var responseDataInfo = MessagePackSerializer.Serialize(gameEndInfo);
+                        await connection.GetStream().WriteAsync(responseDataInfo, 0, responseDataInfo.Length);
+                        Console.WriteLine($"GameEndInfo sent to player {playerId}.");
+                    }
+                    Console.WriteLine($"Player {playerId} not found.");
+                }
+            }
+            Console.WriteLine($"Players notified.");
             var game = new Game
             {
-                LobbyID = createGameRequest.GameData.LobbyID,
-                EndTime = createGameRequest.GameData.EndTime,
-                Status = createGameRequest.GameData.Status,
+                LobbyID = createGameRequest.LobbyID,
+                EndTime = createGameRequest.EndTime,
                 PlayerID = createGameRequest.PlayerID
             };
             await CreateGameAsync(game);
-            await _lobbyManager.DeleteLobbyAsync(game.LobbyID);
+            //await _lobbyManager.DeleteLobbyAsync(game.LobbyID);
             response.Success = true;
             var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
@@ -65,7 +88,7 @@ public class GameManager
         Console.WriteLine("GetGameRequest received.");
         try
         {
-        var getGameRequest = MessagePackSerializer.Deserialize<GetGamePack>(data);
+            var getGameRequest = MessagePackSerializer.Deserialize<GetGamePack>(data);
             var response = new GetGameResponsePack
             {
                 OperationTypeId = (int)OperationType.GetGameResponsePack
@@ -107,7 +130,7 @@ public class GameManager
         // Use the Find method to search the collection and retrieve the game
         // Assuming that there's only one game per lobbyId or you're interested in the first one
         var game = await _games.Find(filter).FirstOrDefaultAsync();
-        return game; 
+        return game;
     }
 
     /// <summary>

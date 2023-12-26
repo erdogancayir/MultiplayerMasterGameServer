@@ -14,7 +14,7 @@ public class GameOverPack : BasePack
 public class GameOverResponse : BasePack
 {
     [Key(1)]
-    public bool Success { get; set; }
+    public int WinnerPlayerId { get; set; }  
     [Key(2)]
     public string? LobbyId { get; set; }
 }

@@ -38,18 +38,29 @@ public class LobbyManager
 
         var result = await _lobbies.UpdateOneAsync(filter, update);
 
-        // Optionally, handle the result to check if the update was successful
-        if(result.MatchedCount == 0)
+        if (result.MatchedCount == 0)
         {
             Console.WriteLine($"Lobby with ID {lobbyId} not found.");
         }
-        else if(result.ModifiedCount == 0)
+        else if (result.ModifiedCount == 0)
         {
             Console.WriteLine($"Player with ID {playerId} not found in lobby {lobbyId}.");
         }
+        else
+        {
+            await UpdateLobbyStatusAfterPlayerLeft(lobbyId);
+            await DeleteLobbyIfEmpty(lobbyId);
+        }
+    }
 
-        // Update the lobby status if necessary
-        await UpdateLobbyStatusAfterPlayerLeft(lobbyId);
+    private async Task DeleteLobbyIfEmpty(string lobbyId)
+    {
+        var lobby = await _lobbies.Find(l => l.LobbyID == lobbyId).FirstOrDefaultAsync();
+        if (lobby != null && lobby.Players != null && lobby.Players.Count == 0)
+        {
+            await _lobbies.DeleteOneAsync(l => l.LobbyID == lobbyId);
+            Console.WriteLine($"Lobby with ID {lobbyId} has been deleted as it has no players.");
+        }
     }
 
     /// <summary>
@@ -111,5 +122,11 @@ public class LobbyManager
     public async Task DeleteLobbyAsync(string? lobbyID)
     {
         await _lobbies.DeleteOneAsync(l => l.LobbyID == lobbyID);
+    }
+
+    public async Task<List<int>> GetPlayersIds(string? lobbyID)
+    {
+        var lobby = await _lobbies.Find(l => l.LobbyID == lobbyID).FirstOrDefaultAsync();
+        return lobby?.Players ?? new List<int>(); // null kontrolü eklendi
     }
 }

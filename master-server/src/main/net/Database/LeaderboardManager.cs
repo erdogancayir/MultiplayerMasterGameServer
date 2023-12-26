@@ -15,15 +15,22 @@ public class LeaderboardManager
     {
         try
         {
-            // Deserialize the request to get the number of top entries needed
             var request = MessagePackSerializer.Deserialize<GetTopLeaderboardPack>(data);
             int limit = request.TopLimit;
 
-            // Fetch the top leaderboard entries
             var topEntriesResponsePacks = await GetTopPlayersAsync(limit);
+            var response = new SendTopLeaderboardResponsePack()
+            {
+                OperationTypeId = (int)OperationType.GetTopLeaderboardEntriesResponse,
+                TopEntries = topEntriesResponsePacks
+            };
 
-            // Serialize and send the list of GetTopLeaderboardResponsePack objects
-            var responseData = MessagePackSerializer.Serialize(topEntriesResponsePacks);
+            foreach (var topEntry in topEntriesResponsePacks)
+            {
+                Console.WriteLine($"Username: {topEntry.Username}, TotalPoints: {topEntry.TotalPoints}");
+            }
+
+            var responseData = MessagePackSerializer.Serialize(response);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
@@ -43,6 +50,7 @@ public class LeaderboardManager
 
         var update = Builders<LeaderboardEntry>.Update
             .Inc(le => le.TotalPoints, entry.TotalPoints)
+            .Set(le => le.Username, entry.Username)
             .SetOnInsert(le => le.PlayerID, entry.PlayerID);
 
         var options = new UpdateOptions { IsUpsert = true };
@@ -58,14 +66,11 @@ public class LeaderboardManager
 
         var responsePacks = leaderboardEntries.Select(le => new GetTopLeaderboardResponsePack
         {
-            LeaderboardEntryID = le.LeaderboardEntryID,
-            PlayerID = le.PlayerID,
+            OperationTypeId = (int)OperationType.GetTopLeaderboardEntriesResponse,
+            Username = le.Username,
             TotalPoints = le.TotalPoints,
-            Username = le.Username
         }).ToList();
 
         return responsePacks;
     }
-
-    // Additional methods as needed
 }

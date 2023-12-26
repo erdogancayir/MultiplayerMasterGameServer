@@ -47,7 +47,7 @@ public class Matchmaker
 
             var allLobbies = await _lobbyManager.GetLobbies();
             var lobby = FindOrCreateLobby(allLobbies, playerId.Value);
-            await SendJoinLobbyResponse(stream, lobby);
+            await SendJoinLobbyResponse(stream, lobby, playerId.Value);
             await _lobbyManager.UpdateLobbyPlayers(lobby.LobbyID, lobby.Players ?? new List<int>());
             await UpdateLobbyStatus(lobby);
         }
@@ -86,7 +86,7 @@ public class Matchmaker
                 MaxPlayers = createLobbyRequest.MaxPlayers
             };
             await _lobbyManager.CreateLobby(newLobby);
-            await SendCreateLobbyResponse(stream, newLobby);
+            await SendCreateLobbyResponse(stream, newLobby, playerId.Value);
         }
         catch (Exception ex)
         {
@@ -112,6 +112,7 @@ public class Matchmaker
         var newLobby = new Lobby
         {
             Players = new List<int> { playerId },
+            MaxPlayers = 2,
             Status = Lobby.LobbyStatus.Waiting,
             CreationTime = DateTime.UtcNow
         };
@@ -127,9 +128,7 @@ public class Matchmaker
     /// <param name="connectionId"></param>
     public async void HandlePlayerLeavingLobby(NetworkStream stream, byte[] data, int connectionId)
     {
-        Console.WriteLine("Player leaving lobby request received.");
         var playerLeavingLobbyRequest = MessagePackSerializer.Deserialize<PlayerLeavingLobbyRequest>(data);
-        
 
         var playerId = _tokenManager.ValidateToken(playerLeavingLobbyRequest.Token);
         if (playerId == null || playerId == 0)
@@ -151,8 +150,9 @@ public class Matchmaker
             return;
         }
         await _lobbyManager.RemovePlayerFromLobby(lobbyId ?? "", playerId.Value);
-        //await _lobbyManager.RemovePlayerFromLobby(lobbyId, playerId);
     }
+
+
 
     /// <summary>
     /// Updates the status of a given lobby and notifies players if the lobby is full.
@@ -192,12 +192,12 @@ public class Matchmaker
     /// </remarks>
     private async Task NotifyPlayersAboutLobbyAssignment(List<Player> players, Lobby lobby)
     {
+        Console.WriteLine($"NOTIFY : Player size : {players.Count} Lobby ID : {lobby.LobbyID}");
         if (players == null || lobby == null)
         {
             Console.WriteLine("Players list or lobby is null.");
             return;
         }
-        var lobbyPlayers = await GetPlayersFromIDs(lobby.Players);
         foreach (var player in players)
         {
             try
@@ -208,16 +208,13 @@ public class Matchmaker
                     Console.WriteLine($"No stream found for player with ID: {player.PlayerID}");
                     continue;
                 }
-
                 var gameStartResponse = new GameStartResponse
                 {
+                    OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerId = player.PlayerID,
                     LobbyID = lobby.LobbyID,
-                    OperationTypeId = (int)OperationType.NotifyGameStart,
                     PlayerCount = lobby.Players?.Count ?? 0,
-                    PlayersInLobby = lobbyPlayers.Select(p => new PlayerInfo { PlayerID = p.PlayerID, Username = p.Username }).ToList()
                 };
-
                 var responseData = MessagePackSerializer.Serialize(gameStartResponse);
                 await playerStream.WriteAsync(responseData, 0, responseData.Length);
                 Console.WriteLine($"Lobby assignment notification sent to player with ID: {player.PlayerID}");
@@ -234,8 +231,7 @@ public class Matchmaker
         var players = new List<Player>();
         foreach (var id in playerIDs)
         {
-            // Bu kısımda, PlayerID'ye göre veritabanından Player nesnesini çekin
-            var player = await this.playerManager.GetPlayerById(id); // GetPlayerById, veritabanınızdan ilgili oyuncuyu çeken metodunuz
+            var player = await this.playerManager.GetPlayerById(id);
             if (player != null)
             {
                 players.Add(player);
@@ -258,28 +254,28 @@ public class Matchmaker
         return players.Where(player => player != null).ToList();
     }
     
-    private async Task SendJoinLobbyResponse(NetworkStream stream, Lobby lobby)
+    private async Task SendJoinLobbyResponse(NetworkStream stream, Lobby lobby, int playerID)
     {
         var response = new MatchmakingResponse
         {
             OperationTypeId = (int)OperationType.JoinLobbyResponse,
             Success = true,
             LobbyID = lobby.LobbyID,
-            PlayerIDs = lobby.Players,
+            PlayerID = playerID,
             Status = lobby.Status?.ToString()
         };
         var responseData = MessagePackSerializer.Serialize(response);
         await stream.WriteAsync(responseData, 0, responseData.Length);
     }
 
-    private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby)
+    private async Task SendCreateLobbyResponse(NetworkStream stream, Lobby lobby, int playerID)
     {
         var response = new CreateLobbyResponse
         {
             OperationTypeId = (int)OperationType.CreateLobbyResponse,
             Success = true,
             LobbyID = lobby.LobbyID,
-            PlayerIDs = lobby.Players,
+            PlayerID = playerID,
             Status = lobby.Status?.ToString()
         };
         var responseData = MessagePackSerializer.Serialize(response);

@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "RdxTOnqhq8d8LG233YD8QL1shdQgB04NsLzLHhcIX1P+gd9CiaHiUQHrLwOALO/K3oUYxA+J7+/q2li8XPHjwA==",
+  "dgSpecHash": "P+1pIFlTH8Bm7y7SSL21oeHdkgPgNNamYstnbVIx4K0PTJgVRZ0+kd+ARCI4oRScUew95kxH5e1xydVGJpzrWw==",
   "success": true,
-  "projectFilePath": "/home/erdogancayir/Desktop/yenile/test-master-server/test/test.csproj",
+  "projectFilePath": "/root/Erdogi2/test-master-server/test/test.csproj",
   "expectedPackageFiles": [
-    "/home/erdogancayir/.nuget/packages/messagepack/2.5.140/messagepack.2.5.140.nupkg.sha512",
-    "/home/erdogancayir/.nuget/packages/messagepack.annotations/2.5.140/messagepack.annotations.2.5.140.nupkg.sha512",
-    "/home/erdogancayir/.nuget/packages/microsoft.net.stringtools/17.6.3/microsoft.net.stringtools.17.6.3.nupkg.sha512",
-    "/home/erdogancayir/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    "/root/.nuget/packages/messagepack/2.5.140/messagepack.2.5.140.nupkg.sha512",
+    "/root/.nuget/packages/messagepack.annotations/2.5.140/messagepack.annotations.2.5.140.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.net.stringtools/17.6.3/microsoft.net.stringtools.17.6.3.nupkg.sha512",
+    "/root/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }
