@@ -20,9 +20,7 @@ public class GameStartResponse : BasePack
     [Key(1)]
     public int PlayerId { get; set; }
     [Key(2)]
-    public int LobbyID { get; set; }
-    [Key(3)]
-    public int OperationTypeId { get; set; }
+    public string? LobbyID { get; set; }
     [Key(4)]
     public int PlayerCount { get; set; }
     [Key(5)]
