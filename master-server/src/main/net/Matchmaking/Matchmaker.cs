@@ -135,7 +135,6 @@ public class Matchmaker
         if (playerId == null || playerId == 0)
         {
             Console.WriteLine("Invalid token.");
-            SendLeavingLobbyResponse(stream, "Invalid token.", false).Wait();
             return;
         }
 
@@ -144,17 +143,14 @@ public class Matchmaker
         if (lobby == null)
         {
             Console.WriteLine($"Lobby with ID {lobbyId} not found.");
-            SendLeavingLobbyResponse(stream, $"Lobby with ID {lobbyId} not found.", false).Wait();
             return;
         }
         if (lobby.Players == null || !lobby.Players.Contains(playerId.Value))
         {
             Console.WriteLine($"Player with ID {playerId} not found in lobby {lobbyId}.");
-            SendLeavingLobbyResponse(stream, $"Player with ID {playerId} not found in lobby {lobbyId}.", false).Wait();
             return;
         }
         await _lobbyManager.RemovePlayerFromLobby(lobbyId ?? "", playerId.Value);
-        SendLeavingLobbyResponse(stream, $"Player with ID {playerId} left lobby {lobbyId}.", true).Wait();
         //await _lobbyManager.RemovePlayerFromLobby(lobbyId, playerId);
     }
 
@@ -273,18 +269,6 @@ public class Matchmaker
             Status = lobby.Status?.ToString()
         };
         var responseData = MessagePackSerializer.Serialize(response);
-        await stream.WriteAsync(responseData, 0, responseData.Length);
-    }
-
-    private async Task SendLeavingLobbyResponse(NetworkStream stream, string message, bool success)
-    {
-        var playerLeavingLobbyResponse = new PlayerLeavingLobbyResponse
-        {
-            OperationTypeId = (int)OperationType.LeavingLobbyResponse,
-            Success = success,
-            Message = message
-        };
-        var responseData = MessagePackSerializer.Serialize(playerLeavingLobbyResponse);
         await stream.WriteAsync(responseData, 0, responseData.Length);
     }
 

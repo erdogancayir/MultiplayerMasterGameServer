@@ -9,4 +9,5 @@ public class LeaderboardEntry
 
     public int? PlayerID { get; set; }
     public int TotalPoints { get; set; } // Total points accumulated
+    public string Username { get; set; }
 }

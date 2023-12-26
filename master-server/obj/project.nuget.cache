@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CBdFPMZMfQF1gkHzFNzvgfEBgwMeHu5FqJTeIh0MvganPSIOPstde7AkebLHEJMcuuPWZxus21XL4WFKDwACYQ==",
+  "dgSpecHash": "xWozaQwo3NX/y8+T+HxvO43vLjiUc9MqqpoZ3mYcN4F+nf9QMN9PJ3lMOe9rn1OCDrIziqLYnJrm80a8pTkmbg==",
   "success": true,
-  "projectFilePath": "/home/erdogancayir/Desktop/gameserver/master-server/master-server.csproj",
+  "projectFilePath": "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj",
   "expectedPackageFiles": [
     "/home/erdogancayir/.nuget/packages/awssdk.core/3.7.100.14/awssdk.core.3.7.100.14.nupkg.sha512",
     "/home/erdogancayir/.nuget/packages/awssdk.securitytoken/3.7.100.14/awssdk.securitytoken.3.7.100.14.nupkg.sha512",

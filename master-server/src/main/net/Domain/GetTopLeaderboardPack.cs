@@ -10,5 +10,11 @@ public class GetTopLeaderboardPack : BasePack
 public class GetTopLeaderboardResponsePack : BasePack
 {
     [Key(1)]
-    public List<LeaderboardEntry>? LeaderboardEntries { get; set; }
+    public string? LeaderboardEntryID { get; set; }
+    [Key(2)]
+    public int? PlayerID { get; set; }
+    [Key(3)]
+    public int TotalPoints { get; set; }
+    [Key(4)]
+    public string Username { get; set; }
 }

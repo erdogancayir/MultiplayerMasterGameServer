@@ -12,13 +12,3 @@ public class PlayerLeavingLobbyRequest : BasePack
     [Key(3)]
     public string Token { get; set; } = string.Empty;
 }
-
-[MessagePackObject]
-public class PlayerLeavingLobbyResponse : BasePack
-{
-    [Key(1)]
-    public bool Success { get; set; }
-
-    [Key(2)]
-    public string? Message { get; set; }
-}

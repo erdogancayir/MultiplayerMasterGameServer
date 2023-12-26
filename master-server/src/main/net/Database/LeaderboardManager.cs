@@ -20,15 +20,10 @@ public class LeaderboardManager
             int limit = request.TopLimit;
 
             // Fetch the top leaderboard entries
-            var topEntries = await GetTopPlayersAsync(limit);
+            var topEntriesResponsePacks = await GetTopPlayersAsync(limit);
 
-            // Prepare the response
-            var response = new GetTopLeaderboardResponsePack
-            {
-                LeaderboardEntries = topEntries
-            };
-            // Serialize and send the response
-            var responseData = MessagePackSerializer.Serialize(response);
+            // Serialize and send the list of GetTopLeaderboardResponsePack objects
+            var responseData = MessagePackSerializer.Serialize(topEntriesResponsePacks);
             await clientStream.WriteAsync(responseData, 0, responseData.Length);
         }
         catch (Exception ex)
@@ -54,9 +49,22 @@ public class LeaderboardManager
         await _leaderboard.UpdateOneAsync(filter, update, options);
     }
 
-    public async Task<List<LeaderboardEntry>> GetTopPlayersAsync(int limit)
+    public async Task<List<GetTopLeaderboardResponsePack>> GetTopPlayersAsync(int limit)
     {
-        return await _leaderboard.Find(_ => true).SortByDescending(le => le.TotalPoints).Limit(limit).ToListAsync();
+        var leaderboardEntries = await _leaderboard.Find(_ => true)
+                                                   .SortByDescending(le => le.TotalPoints)
+                                                   .Limit(limit)
+                                                   .ToListAsync();
+
+        var responsePacks = leaderboardEntries.Select(le => new GetTopLeaderboardResponsePack
+        {
+            LeaderboardEntryID = le.LeaderboardEntryID,
+            PlayerID = le.PlayerID,
+            TotalPoints = le.TotalPoints,
+            Username = le.Username
+        }).ToList();
+
+        return responsePacks;
     }
 
     // Additional methods as needed

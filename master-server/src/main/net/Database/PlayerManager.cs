@@ -198,4 +198,15 @@ public class PlayerManager
 
         return updatedCounter.SeqValue;
     }
+
+    public async Task<string> GetUsernameByPlayerId(int playerId)
+    {
+        var player = await _players.Find(p => p.PlayerID == playerId).FirstOrDefaultAsync();
+        if (player == null)
+        {
+            throw new NullReferenceException("Player not found.");
+        }
+
+        return player.Username;
+    }
 }

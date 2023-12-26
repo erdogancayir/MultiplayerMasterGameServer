@@ -7,12 +7,14 @@ public class GameManager
     private readonly IMongoCollection<Game> _games;
     private readonly LeaderboardManager _leaderboardManager;
     private readonly LobbyManager _lobbyManager;
+    private readonly PlayerManager _playerManager;
 
-    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager, LobbyManager lobbyManager)
+    public GameManager(DbInterface dbInterface, LeaderboardManager leaderboardManager, LobbyManager lobbyManager, PlayerManager playerManager)
     {
         _games = dbInterface.GetCollection<Game>("Games");
         _leaderboardManager = leaderboardManager;
         _lobbyManager = lobbyManager;
+        _playerManager = playerManager;
     }
 
     /// <summary>
@@ -117,10 +119,13 @@ public class GameManager
     {
         var pointsToAdd = 10;
 
+        string username = await _playerManager.GetUsernameByPlayerId(game.PlayerID);
+
         var leaderboardEntry = new LeaderboardEntry
         {
             PlayerID = game.PlayerID,
-            TotalPoints = pointsToAdd
+            TotalPoints = pointsToAdd,
+            Username = username
         };
         await _leaderboardManager.UpdateOrInsertLeaderboardEntryAsync(leaderboardEntry);
     }
