@@ -49,6 +49,7 @@ public class SocketListener
             { OperationType.SignUpRequest, authService.HandleSignUpRequest },
             { OperationType.JoinLobbyRequest, matchmaker.HandleJoinLobbyRequest },
             { OperationType.CreateLobbyRequest, matchmaker.CreateLobby },
+            { OperationType.LeaveLobbyRequest, matchmaker.HandlePlayerLeavingLobby },
             { OperationType.GameEndData, gameManager.HandleCreateGameRequest },
             // to do
             { OperationType.GetTopLeaderboardEntries, leaderboardManager.HandleGetTopLeaderboardEntriesRequest},

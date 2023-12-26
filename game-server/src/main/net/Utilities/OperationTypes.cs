@@ -12,4 +12,6 @@ public enum OperationType
     Test = 666,
     EndPoint = 602,
     GameOverRequest = 603,
+    LeaveLobbyRequest = 202,
+
 }

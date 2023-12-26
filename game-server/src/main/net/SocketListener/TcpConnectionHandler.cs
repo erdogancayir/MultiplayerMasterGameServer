@@ -29,6 +29,8 @@ public class TcpConnectionHandler
             { OperationType.PlayerLobbyInfo, PlayerLobbyInfo }, // New: PlayerLobbyInfo
             { OperationType.HeartbeatPing, HeartbeatPing }, // New: HeartbeatPing
             { OperationType.GameOverRequest, GameOverRequest } // New: HeartbeatPing
+            { OperationType.GameOverRequest, GameOverRequest } // New: HeartbeatPing
+            { OperationType.LeaveLobbyRequest, HandlePlayerLeavingLobby },
         };
     }
 
@@ -49,6 +51,10 @@ public class TcpConnectionHandler
         }
     }
 
+    /// <summary>
+    /// Handles a game over request from the server. 
+    /// This is sent by the server to notify the client that the game has ended.
+    /// </summary>
     public async void GameOverRequest(NetworkStream stream, byte[] data, int connectionId)
     {
         try
@@ -79,8 +85,6 @@ public class TcpConnectionHandler
     /// <summary>
     /// Ends the game.
     /// </summary>
-    /// <param name="lobbyId"></param>
-    /// <param name="playerId"></param>
     public void EndGame(string lobbyId, int playerId)
     {
         Game gameData = new Game
@@ -163,6 +167,26 @@ public class TcpConnectionHandler
         catch (Exception ex)
         {
             Console.WriteLine($"Error in AddOrUpdatePlayer: {ex}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a player leaving lobby message from the server.
+    /// This is sent by the server to notify the client that the player has left the lobby.
+    /// </summary>
+    public void HandlePlayerLeavingLobby(NetworkStream stream, byte[] data, int connectionId)
+    {
+        try
+        {
+            var playerLeavingLobbyRequest = MessagePackSerializer.Deserialize<PlayerLeavingLobbyRequest>(data);
+            var lobbyId = playerLeavingLobbyRequest.LobbyId;
+            var playerId = playerLeavingLobbyRequest.PlayerId;
+            Console.WriteLine($"Player {playerId} left lobby {lobbyId}.");
+            _positionManager.RemovePlayer(playerId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in HandlePlayerLeavingLobby: {ex}");
         }
     }
 
