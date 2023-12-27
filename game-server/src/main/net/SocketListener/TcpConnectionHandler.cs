@@ -224,7 +224,6 @@ public class TcpConnectionHandler
                 }
                 else
                 {
-                    Console.WriteLine($"Client disconnected. PlayerId : {_connectionId} ");
                     CloseConnection();
                 }
             }

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/root/Erdogi2/master-server/master-server.csproj": {}
+    "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj": {}
   },
   "projects": {
-    "/root/Erdogi2/master-server/master-server.csproj": {
+    "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/root/Erdogi2/master-server/master-server.csproj",
+        "projectUniqueName": "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj",
         "projectName": "master-server",
-        "projectPath": "/root/Erdogi2/master-server/master-server.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/root/Erdogi2/master-server/obj/",
+        "projectPath": "/home/erdogancayir/Desktop/Erdogi2/master-server/master-server.csproj",
+        "packagesPath": "/home/erdogancayir/.nuget/packages/",
+        "outputPath": "/home/erdogancayir/Desktop/Erdogi2/master-server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/home/erdogancayir/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -107,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/erdogancayir/.dotnet/sdk/8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
